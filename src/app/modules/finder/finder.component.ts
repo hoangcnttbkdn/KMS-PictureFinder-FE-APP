@@ -11,7 +11,32 @@ import { FinderService } from '../services/finder.service';
 export class FinderComponent implements OnInit {
   imageFile: File;
   imagePreview: any;
-  images = [];
+  images = [
+    {
+      url: 'https://static1.dienanh.net/360x720/upload/2020/04/06/baifern-pimchanok-chung-to-nhan-sac-tu-nhien-voi-anh-tho-au-xinh-dep-ccc47b.jpg',
+      id: 1,
+    },
+    {
+      url: 'https://static1.dienanh.net/360x720/upload/2020/04/06/baifern-pimchanok-chung-to-nhan-sac-tu-nhien-voi-anh-tho-au-xinh-dep-ccc47b.jpg',
+      id: 2,
+    },
+    {
+      url: 'https://static1.dienanh.net/360x720/upload/2020/04/06/baifern-pimchanok-chung-to-nhan-sac-tu-nhien-voi-anh-tho-au-xinh-dep-ccc47b.jpg',
+      id: 3,
+    },
+    {
+      url: 'https://static1.dienanh.net/360x720/upload/2020/04/06/baifern-pimchanok-chung-to-nhan-sac-tu-nhien-voi-anh-tho-au-xinh-dep-ccc47b.jpg',
+      id: 1,
+    },
+    {
+      url: 'https://static1.dienanh.net/360x720/upload/2020/04/06/baifern-pimchanok-chung-to-nhan-sac-tu-nhien-voi-anh-tho-au-xinh-dep-ccc47b.jpg',
+      id: 2,
+    },
+    {
+      url: 'https://static1.dienanh.net/360x720/upload/2020/04/06/baifern-pimchanok-chung-to-nhan-sac-tu-nhien-voi-anh-tho-au-xinh-dep-ccc47b.jpg',
+      id: 3,
+    },
+  ];
 
   selectedType: string = 'drive';
   url: string = '';
