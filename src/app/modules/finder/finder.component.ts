@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { NotifyService } from '@app/shared/services/notify.service';
 import { finalize } from 'rxjs';
 import { FinderService } from '../services/finder.service';
 
 @Component({
   selector: 'app-finder',
-  templateUrl: './finder.component.html'
+  templateUrl: './finder.component.html',
+  styleUrls: ['./finder.component.scss']
 })
 export class FinderComponent implements OnInit {
   imageFile: File;
@@ -17,7 +19,7 @@ export class FinderComponent implements OnInit {
   token: string = '';
   isLoading: boolean = false;
 
-  constructor(private finderService: FinderService) {}
+  constructor(private finderService: FinderService, private notifyService: NotifyService) {}
 
   ngOnInit() {}
 
@@ -34,6 +36,7 @@ export class FinderComponent implements OnInit {
   }
 
   findImages() {
+    if (!this.validate()) return;
     this.isLoading = true;
     this.images = [];
     if (this.selectedType === 'drive') {
@@ -68,13 +71,13 @@ export class FinderComponent implements OnInit {
 
   validate() {
     // validate valid url
-    if (this.url.trim() === '' || !this.validateUrl(this.url.trim())) {
-      alert('Please enter a valid url');
+    if (!this.isValidUrl(this.url.trim())) {
+      this.notifyService.showToast('Please enter a valid url', 3000);
       return false;
     }
     // validate has targetImage
     if (!this.imageFile) {
-      alert('Please select a target image');
+      this.notifyService.showToast('Please select a target image', 3000);
       return false;
     }
     // if type is facebook, validate has access token, cookie
@@ -82,22 +85,16 @@ export class FinderComponent implements OnInit {
       this.selectedType === 'facebook' &&
       (this.token.trim() === '' || this.cookie.trim() === '')
     ) {
-      alert('Please enter a valid token and cookie');
+      this.notifyService.showToast('Please enter a valid token and cookie', 3000);
       return false;
     }
     return true;
   }
 
-  validateUrl(url: string) {
-    var urlPattern = new RegExp(
-      '^(https?:\\/\\/)?' + // validate protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // validate domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))' + // validate OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // validate port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?' + // validate query string
-        '(\\#[-a-z\\d_]*)?$',
-      'i'
-    );
-    return !!urlPattern.test(url);
-  }
+  isValidUrl(url: string) {
+    const urlRegex = /^((http|https|ftp|www):\/\/)?([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)(\.)([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]+)/g;
+    const result = url.match(urlRegex);
+    return result !== null;
+  };
+  
 }
