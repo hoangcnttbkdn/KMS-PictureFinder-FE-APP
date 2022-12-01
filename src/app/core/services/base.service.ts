@@ -82,15 +82,6 @@ export class BaseService {
   post<T>(url: string, data: any, isCatchError: boolean = true): Observable<T> {
     return this.httpClient
       .post<T>(`${this.baseURL}/${url}`, data, this.options)
-      .pipe(
-        map((res: any) => {
-          if (res.success) {
-            return res.data;
-          } else {
-            throw new Error(res.message);
-          }
-        })
-      );
   }
 
   postForm<T>(url: string, data: any): Observable<T> {
@@ -98,15 +89,6 @@ export class BaseService {
       .post<T>(`${this.baseURL}/${url}`, data, {
         headers: this.formHeaders
       })
-      .pipe(
-        map((res: any) => {
-          if (res.success) {
-            return res.data;
-          } else {
-            throw new Error(res.message);
-          }
-        })
-      );
   }
 
   // NOTE: post file image => return url as json text
@@ -115,15 +97,6 @@ export class BaseService {
       .post<T>(`${this.baseURL}/${url}`, data, {
         headers: this.formHeaders,
       })
-      .pipe(
-        map((res: any) => {
-          if (res.success) {
-            return res.data;
-          } else {
-            throw new Error(res.message);
-          }
-        })
-      );
   }
 
   async postAsync<T>(
@@ -141,15 +114,6 @@ export class BaseService {
   put<T>(url: string, data: any): Observable<T> {
     return this.httpClient
       .put<T>(`${this.baseURL}/${url}`, data, this.options)
-      .pipe(
-        map((res: any) => {
-          if (res.success) {
-            return res.data;
-          } else {
-            throw new Error(res.message);
-          }
-        })
-      );
   }
   //#endregion
 
@@ -157,15 +121,6 @@ export class BaseService {
   delete<T>(url: string): Observable<T> {
     return this.httpClient
       .delete<T>(`${this.baseURL}/${url}`, this.options)
-      .pipe(
-        map((res: any) => {
-          if (res.success) {
-            return res.data;
-          } else {
-            throw new Error(res.message);
-          }
-        })
-      );
   }
   //#endregion
 }
