@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  appbuild:
+    build:
+      dockerfile: docker/Dockerfile.building
+      context: .
+    image: appbuild
+
+  app:
+    build:
+      dockerfile: docker/Dockerfile.nginx
+      context: .
+    image: picturesfinder-fe
+    restart: always
+    container_name: picture-finder-fe
+    ports:
+      - "3000:80"      
