@@ -45,3 +45,4 @@ Thumbs.db
 
 ./environments/environment.prod.ts
 ./environments/environment.ts
+./node_modules

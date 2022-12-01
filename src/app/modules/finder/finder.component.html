@@ -4,7 +4,7 @@
       Picture <b class="text-indigo-700 text-[35px]"> Finder</b>
     </h1>
     <p class="mx-11 mb-4 text-sm text-gray-500">
-       Enter url or upload image to find similar images.
+      Enter url or upload image to find similar images.
     </p>
   </div>
 
@@ -20,7 +20,10 @@
           placeholder="Enter url..."
         />
 
-        <div class="absolute right-1 top-1/2 -mt-5 cursor-pointer" (click)="findImages()">
+        <div
+          class="absolute right-1 top-1/2 -mt-5 cursor-pointer"
+          (click)="findImages()"
+        >
           <a
             class="hover:bg-indigo-400 group flex items-center rounded-md bg-indigo-500 text-white text-sm font-medium px-3 py-[10px] shadow-sm"
           >
@@ -103,4 +106,4 @@
   </section>
 </div>
 
-<app-footer class="mt-10"></app-footer>
+<!-- <app-footer class="mt-10"></app-footer> -->

@@ -12,18 +12,7 @@ export class UploadImageComponent implements OnInit {
   constructor(private commonService: CommonService) {}
 
   ngOnInit(): void {}
-
-  onFileSelected(e) {
-    const selectedFiles = e.target.files;
-    if (selectedFiles && selectedFiles[0]) {
-      for (let i = 0; i < selectedFiles.length; i++) {
-        this.commonService.uploadImage(selectedFiles[i]).subscribe(res => {
-          this.onImageUploaded.emit(res);
-        });
-      }
-    }
-  }
-
+  
   onUploadFile(e) {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
