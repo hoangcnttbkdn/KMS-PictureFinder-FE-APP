@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
+import { FinderComponent } from './modules/finder/finder.component';
 
 const routes: Routes = [
   {
-    path: 'auth',
-    loadChildren: () =>
-      import('@app/modules/finder/finder.module').then(m => m.FinderModule)
+    path: '',
+    component: FinderComponent,
   },
   // { path: '**', component: PageNotFoundComponent }
 ];

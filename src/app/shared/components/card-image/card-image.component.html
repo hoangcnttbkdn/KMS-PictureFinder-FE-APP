@@ -1,0 +1,31 @@
+<div>
+  <div class="card-container h-56 relative shadow-lg">
+    <div class="overlay"></div>
+    <div class="content-wrapper">
+      <div class="image-wrapper">
+        <img [src]="image.url" alt="" srcset="" />
+      </div>
+      <div
+        class="info-wrapper flex flex-column justify-between text-white"
+      >
+        <div class="ml-auto p-2">
+          <div class="fullscreen-button" (click)="viewFullScreen()">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </div>
+        </div>
+        <div class="py-2">
+          <div class="flex items-center gap-2">
+            <small>Picture'name</small>
+            <div class="mr-auto"></div>
+            <div class="flex gap-3">
+              <i class="bi bi-search"></i>
+              <a class="text-white" (click)="downloadImage()">
+                <i class="bi bi-download"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,3 +1,4 @@
+import { FinderComponent } from './../modules/finder/finder.component';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -5,35 +6,33 @@ import { SwiperModule } from 'swiper/angular';
 import { RouterModule } from '@angular/router';
 // components
 import { SwiperTemplateComponent } from './components/swiper-template/swiper-template.component';
-import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
-import { SvgIconsRegistryService } from './services/svg-icon-registry.service';
-import { completeIconSet } from 'src/assets/images/svg-icons.constants';
 import { UploadImageComponent } from './components/upload-image/upload-image.component';
+import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { SelectBoxComponent } from './components/select-box/select-box.component';
+import { CardImageComponent } from './components/card-image/card-image.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { SkeletonComponent } from './components/skeleton/skeleton.component';
 
 const COMPONENTS: any[] = [
-  SvgIconComponent,
   SwiperTemplateComponent,
-  UploadImageComponent
+  UploadImageComponent,
+  SearchBarComponent,
+  SelectBoxComponent,
+  CardImageComponent,
+  FooterComponent,
+  SkeletonComponent,
+  FinderComponent
 ];
-
-const SVG_ICONS = completeIconSet;
 
 @NgModule({
   imports: [
     CommonModule,
-    SwiperModule,
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forChild([])
   ],
   exports: [...COMPONENTS],
   declarations: [...COMPONENTS],
-  providers: [
-    SvgIconsRegistryService,
-  ]
+  providers: []
 })
-export class SharedModule {
-  constructor(private svgIconRegistry: SvgIconsRegistryService) {
-    svgIconRegistry.registerIcons(SVG_ICONS);
-  }
-}
+export class SharedModule {}

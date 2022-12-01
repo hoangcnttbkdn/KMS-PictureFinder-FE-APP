@@ -4,9 +4,8 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://node-1.silk-cat.software:7133/api',
-  webSocketEndpoint: 'wss://',
-  googleClientId: '',
+  // baseUrl: 'https://be.picturesfinder.software/api',
+  baseUrl: 'http://34.143.233.85/api',
 };
 
 /*
