@@ -12,6 +12,7 @@
     <div class="flex flex-wrap justify-center gap-2 mb-5">
       <form class="group relative flex-1">
         <input
+          [disabled]="isLoading"
           class="focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 pl-10 pr-10 ring-1 ring-slate-200 shadow-sm"
           type="text"
           [(ngModel)]="url"
@@ -20,7 +21,8 @@
           placeholder="Enter url..."
         />
 
-        <div
+        <button
+          [disabled]="!url || isLoading || !imageFile"
           class="absolute right-1 top-1/2 -mt-5 cursor-pointer"
           (click)="findImages()"
         >
@@ -31,7 +33,7 @@
               width="20"
               height="20"
               fill="currentColor"
-              class=" text-white pointer-events-none"
+              class="text-white pointer-events-none"
               aria-hidden="true"
             >
               <path
@@ -41,7 +43,7 @@
               />
             </svg>
           </a>
-        </div>
+        </button>
       </form>
 
       <select
@@ -83,6 +85,7 @@
           class="w-full h-52 rounded-md shadow-md mb-2 object-cover"
         />
         <app-upload-image
+          [isLoading]="isLoading"
           [onlyButton]="imagePreview"
           (onImageUploaded)="onImageUploaded($event)"
         ></app-upload-image>
@@ -92,13 +95,13 @@
         *ngIf="!isLoading; else skeleton"
         class="lg:w-4/5 flex flex-wrap justify-between lg:justify-center gap-12"
       >
-        <ng-container *ngIf="!!images && images.length > 0; else emptyImage">
+        <ng-container *ngIf="!!images && images.length > 0">
           <div *ngFor="let item of images" class="relative">
             <app-card-image [image]="item"></app-card-image>
           </div>
         </ng-container>
 
-        <ng-template #emptyImage>
+        <ng-container *ngIf="!!images && images.length === 0">
           <div class="flex flex-col items-center justify-center">
             <img
               src="assets/images/empty.png"
@@ -106,7 +109,7 @@
             />
             <p class="text-gray-500 text-sm">No images found</p>
           </div>
-        </ng-template>
+        </ng-container>
       </div>
 
       <ng-template #skeleton>
