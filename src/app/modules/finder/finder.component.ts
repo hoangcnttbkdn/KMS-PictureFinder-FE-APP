@@ -11,7 +11,7 @@ import { FinderService } from '../services/finder.service';
 export class FinderComponent implements OnInit {
   imageFile: File;
   imagePreview: any;
-  images = [];
+  images: [];
 
   selectedType: string = 'drive';
   url: string = '';
@@ -30,7 +30,6 @@ export class FinderComponent implements OnInit {
     this.imageFile = file;
     const reader = new FileReader();
     reader.onload = (e) => (this.imagePreview = reader.result);
-
     reader.readAsDataURL(file);
   }
 
@@ -50,9 +49,14 @@ export class FinderComponent implements OnInit {
             this.isLoading = false;
           })
         )
-        .subscribe((res: any) => {
-          this.images = res;
-        });
+        .subscribe(
+          (res: any) => {
+            this.images = res;
+          },
+          (err) => {
+            this.notifyService.showToast(err.error.message, 5000);
+          }
+        );
     } else {
       this.finderService
         .findImagesFromFacebookByOne(
@@ -62,9 +66,14 @@ export class FinderComponent implements OnInit {
           this.cookie
         )
         .pipe(finalize(() => (this.isLoading = false)))
-        .subscribe((res: any) => {
-          this.images = res;
-        });
+        .subscribe(
+          (res: any) => {
+            this.images = res;
+          },
+          (err) => {
+            this.notifyService.showToast(err.error.message, 5000);
+          }
+        );
     }
   }
 
