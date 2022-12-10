@@ -5,7 +5,7 @@ import { Observable, ReplaySubject, throwError, map, of } from 'rxjs';
 import { environment } from '@environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BaseService {
   LOGGED_USER = 'userInfo';
@@ -41,14 +41,14 @@ export class BaseService {
   get headers(): HttpHeaders {
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: this.bearerAuthentication
+      Authorization: this.bearerAuthentication,
     });
   }
 
   // Note: for file upload, dont add Content-Type
   get formHeaders(): HttpHeaders {
     return new HttpHeaders({
-      Authorization: this.bearerAuthentication
+      Authorization: this.bearerAuthentication,
     });
   }
 
@@ -60,15 +60,7 @@ export class BaseService {
 
   //#region GET Methods
   get<T>(url: string): Observable<T> {
-    return this.httpClient.get<T>(`${this.baseURL}/${url}`, this.options).pipe(
-      map((res: any) => {
-        if (res.success) {
-          return res.data;
-        } else {
-          throw new Error(res.message);
-        }
-      })
-    );
+    return this.httpClient.get<T>(`${this.baseURL}/${url}`, this.options);
   }
 
   async getAsync<T>(url: string): Promise<T> {
@@ -80,23 +72,24 @@ export class BaseService {
 
   //#region POST Methods
   post<T>(url: string, data: any, isCatchError: boolean = true): Observable<T> {
-    return this.httpClient
-      .post<T>(`${this.baseURL}/${url}`, data, this.options)
+    return this.httpClient.post<T>(
+      `${this.baseURL}/${url}`,
+      data,
+      this.options
+    );
   }
 
   postForm<T>(url: string, data: any): Observable<T> {
-    return this.httpClient
-      .post<T>(`${this.baseURL}/${url}`, data, {
-        headers: this.formHeaders
-      })
+    return this.httpClient.post<T>(`${this.baseURL}/${url}`, data, {
+      headers: this.formHeaders,
+    });
   }
 
   // NOTE: post file image => return url as json text
   postFile<T>(url: string, data: any): Observable<T> {
-    return this.httpClient
-      .post<T>(`${this.baseURL}/${url}`, data, {
-        headers: this.formHeaders,
-      })
+    return this.httpClient.post<T>(`${this.baseURL}/${url}`, data, {
+      headers: this.formHeaders,
+    });
   }
 
   async postAsync<T>(
@@ -112,15 +105,13 @@ export class BaseService {
 
   //#region PUT Methods
   put<T>(url: string, data: any): Observable<T> {
-    return this.httpClient
-      .put<T>(`${this.baseURL}/${url}`, data, this.options)
+    return this.httpClient.put<T>(`${this.baseURL}/${url}`, data, this.options);
   }
   //#endregion
 
   //#region DELETE Methods
   delete<T>(url: string): Observable<T> {
-    return this.httpClient
-      .delete<T>(`${this.baseURL}/${url}`, this.options)
+    return this.httpClient.delete<T>(`${this.baseURL}/${url}`, this.options);
   }
   //#endregion
 }
