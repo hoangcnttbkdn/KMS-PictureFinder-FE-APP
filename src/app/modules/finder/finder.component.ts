@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NotifyService } from '@app/shared/services/notify.service';
-import { finalize } from 'rxjs';
+import { finalize, map } from 'rxjs';
 import { FinderService } from '../services/finder.service';
 
 @Component({
@@ -37,10 +37,65 @@ export class FinderComponent implements OnInit {
     this.selectedType = type;
   }
 
-  findImages() {
-    if (!this.validate()) return;
+  onSearchButtonClicked() {
+    if (!this.validate()) {
+      return;
+    }
     this.isLoading = true;
     this.images = [];
+    this.getSession();
+  }
+
+  getSession() {
+    if (this.selectedType === 'drive') {
+      this.finderService.getDriveSession(this.url, this.imageFile).subscribe(
+        (res: any) => {
+          const sessionId = res.sessionId;
+          this.getSessionInfo(sessionId);
+        },
+        (err) => {
+          this.notifyService.showToast(err.error.message, 5000);
+        }
+      );
+    } else {
+      this.finderService
+        .getFacebokSession(this.url, this.imageFile, this.token, this.cookie)
+        .subscribe((res: any) => {
+          const sessionId = res.sessionId;
+          this.getSessionInfo(sessionId);
+        });
+    }
+  }
+
+  getSessionInfo(sessionId: number) {
+    if (sessionId) {
+      let waiting = setInterval(() => {
+        this.finderService.getInfoBySession(sessionId).subscribe((res: any) => {
+          console.log(res);
+          if (res.isFinished) {
+            clearInterval(waiting);
+            this.finderService
+              .getImagesBySession(sessionId)
+              .pipe(
+                finalize(() => {
+                  this.isLoading = false;
+                })
+              )
+              .subscribe(
+                (res: any) => {
+                  this.images = res.filter((image) => image.isMatch);
+                },
+                (err) => {
+                  this.notifyService.showToast(err.error.message, 5000);
+                }
+              );
+          }
+        });
+      }, 5000);
+    }
+  }
+
+  findImages() {
     if (this.selectedType === 'drive') {
       this.finderService
         .findImagesFromDriveByOne(this.url, this.imageFile)

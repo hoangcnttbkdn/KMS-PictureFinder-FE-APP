@@ -24,7 +24,7 @@
         <button
           [disabled]="!url || isLoading || !imageFile"
           class="absolute right-1 top-1/2 -mt-5 cursor-pointer"
-          (click)="findImages()"
+          (click)="onSearchButtonClicked()"
         >
           <a
             class="hover:bg-indigo-400 group flex items-center rounded-md bg-indigo-500 text-white text-sm font-medium px-3 py-[10px] shadow-sm"
@@ -115,8 +115,8 @@
       <ng-template #skeleton>
         <div class="flex gap-2 justify-center w-full">
           <app-skeleton> </app-skeleton>
-          <app-skeleton> </app-skeleton>
-          <app-skeleton> </app-skeleton>
+          <app-skeleton class="hidden md:block"> </app-skeleton>
+          <app-skeleton class="hidden sm:block"> </app-skeleton>
         </div>
       </ng-template>
     </div>
