@@ -83,7 +83,7 @@ export class FinderComponent implements OnInit {
               )
               .subscribe(
                 (res: any) => {
-                  this.images = res.filter((image) => image.isMatch);
+                  this.images = res.filter((image) => image.isMatched);
                 },
                 (err) => {
                   this.notifyService.showToast(err.error.message, 5000);
