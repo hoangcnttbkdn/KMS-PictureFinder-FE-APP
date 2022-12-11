@@ -93,10 +93,10 @@
 
       <div
         *ngIf="!isLoading; else skeleton"
-        class="lg:w-4/5 flex flex-wrap justify-between lg:justify-center gap-12"
+        class="lg:w-4/5 flex flex-wrap justify-start gap-y-12 pl-5"
       >
         <ng-container *ngIf="!!images && images.length > 0">
-          <div *ngFor="let item of images" class="relative">
+          <div *ngFor="let item of images" class="relative image-wrapper">
             <app-card-image [image]="item"></app-card-image>
           </div>
         </ng-container>
