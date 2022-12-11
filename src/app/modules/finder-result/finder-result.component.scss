@@ -1,0 +1,26 @@
+.finder-container {
+    min-height: calc(100vh - 70px);
+    max-width: 1400px;
+    margin: auto;
+  
+    .image-wrapper {
+      width: 33%;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .finder-container {
+      .image-wrapper {
+        width: 50%;
+      }
+    }
+  }
+  
+  
+  @media screen and (max-width: 480px) {
+    .finder-container {
+      .image-wrapper {
+        width: 100%;
+      }
+    } 
+  }

@@ -1,4 +1,3 @@
-import { FinderComponent } from './../modules/finder/finder.component';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -18,7 +17,6 @@ const COMPONENTS: any[] = [
   CardImageComponent,
   FooterComponent,
   SkeletonComponent,
-  FinderComponent,
   FooterComponent,
   UploadImageComponent,
   ToastComponent
