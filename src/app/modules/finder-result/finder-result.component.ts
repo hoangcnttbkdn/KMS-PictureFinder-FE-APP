@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { NotifyService } from '@app/shared/services/notify.service';
 import { finalize, map } from 'rxjs';
 import { SessionInfo } from '../models/session';
 import { FinderService } from '../services/finder.service';
 
 @Component({
-  selector: 'app-finder',
-  templateUrl: './finder.component.html',
-  styleUrls: ['./finder.component.scss'],
+  selector: 'app-finder-result',
+  templateUrl: './finder-result.component.html',
+  styleUrls: ['./finder-result.component.scss'],
 })
-export class FinderComponent implements OnInit {
+export class FinderResultComponent implements OnInit {
   imageFile: File;
   imagePreview: any;
   images: [];
@@ -20,53 +21,20 @@ export class FinderComponent implements OnInit {
   cookie: string = '';
   token: string = '';
   isLoading: boolean = false;
-  isInformPopupVisible: boolean = true;
+  isLoadingSessionInfo: boolean = true;
 
   constructor(
     private finderService: FinderService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
+    private route: ActivatedRoute
   ) {}
 
-  ngOnInit() {}
-
-  onImageUploaded(file: File) {
-    this.imageFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => (this.imagePreview = reader.result);
-    reader.readAsDataURL(file);
-  }
-
-  selectedTypeChanged(type: string) {
-    this.selectedType = type;
-  }
-
-  onSearchButtonClicked() {
-    if (!this.validate()) {
-      return;
-    }
-    this.isLoading = true;
-    this.images = [];
-    this.getSession();
-  }
-
-  getSession() {
-    if (this.selectedType === 'drive') {
-      this.finderService.getDriveSession(this.url, this.imageFile).subscribe(
-        (res: any) => {
-          const sessionId = res.sessionId;
-          this.getSessionInfo(sessionId);
-        },
-        (err) => {
-          this.notifyService.showToast(err.error.message, 5000);
-        }
-      );
-    } else {
-      this.finderService
-        .getFacebokSession(this.url, this.imageFile, this.token, this.cookie)
-        .subscribe((res: any) => {
-          const sessionId = res.sessionId;
-          this.getSessionInfo(sessionId);
-        });
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('sessionId');
+    if (id) {
+      this.isLoading = true;
+      this.isLoadingSessionInfo = true;
+      this.getSessionInfo(parseInt(id));
     }
   }
 
@@ -74,10 +42,11 @@ export class FinderComponent implements OnInit {
     if (sessionId) {
       let waiting = setInterval(() => {
         this.finderService.getInfoBySession(sessionId).subscribe((res: any) => {
-          if (!this.sessionInfo) {
+          if (this.isLoadingSessionInfo && !!res) {
             this.sessionInfo = res;
-            this.isInformPopupVisible = true;
+            this.isLoadingSessionInfo = false;
           }
+
           if (res.isFinished) {
             clearInterval(waiting);
             this.finderService
