@@ -48,7 +48,7 @@ Step 5: Click search button and waiting for the magic 🧝‍♂️ 🪄🪄
 # Main branches 🌵
 - feature: develop
 - develop: staging
-- main: production
+- master: production
 
 
 # About technical of project 💻
