@@ -53,7 +53,10 @@
             </ng-container>
             <app-skeleton *ngIf="isLoadingSessionInfo"> </app-skeleton>
           </div>
-          <div *ngIf="!isLoading" class="flex gap-2 justify-end my-3">
+          <div
+            *ngIf="!isLoading && images?.length > 0"
+            class="flex gap-2 justify-end my-3"
+          >
             <button
               (click)="downloadAllImages()"
               type="button"
