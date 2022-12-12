@@ -53,11 +53,14 @@
             </ng-container>
             <app-skeleton *ngIf="isLoadingSessionInfo"> </app-skeleton>
           </div>
-          <div *ngIf="!isLoading" class="flex gap-2 justify-end my-3">
+          <div
+            *ngIf="!isLoading && images?.length > 0"
+            class="flex gap-2 justify-end my-3 w-full"
+          >
             <button
               (click)="downloadAllImages()"
               type="button"
-              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             >
               Download All
             </button>
