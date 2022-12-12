@@ -1,12 +1,16 @@
 <div class="finder-container m-auto">
   <app-navbar></app-navbar>
 
-  <div class="mt-4 text-center">
+  <div class="mt-1 text-center">
     <h1 class="mx-11 my-1 font-bold text-[30px] text-gray-600">
       Picture <b class="text-indigo-700 text-[35px]"> Finder</b>
     </h1>
     <p class="mx-11 mb-4 text-sm text-gray-500">
       Enter url or upload image to find similar images.
+      <br />
+      <span class="text-blue-800"
+        >If you enter your email, the results will be sent to you when request session is completed</span
+      >
     </p>
   </div>
 
@@ -62,7 +66,7 @@
         id="type"
         [(ngModel)]="selectedType"
         [ngModelOptions]="{ standalone: true }"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full md:w-1/5 p-3 "
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full md:w-1/5 p-3"
       >
         <option value="drive">Drive</option>
         <option value="facebook">Facebook</option>
