@@ -1,18 +1,11 @@
 version: "3.9"
 
 services:
-  appbuild:
-    build:
-      dockerfile: docker/Dockerfile.building
-      context: .
-    image: appbuild
-
   app:
     build:
-      dockerfile: docker/Dockerfile.nginx
+      dockerfile: docker/Dockerfile.prod
       context: .
-    image: picturesfinder-fe
-    restart: always
-    container_name: picture-finder-fe
+    image: kms-picture-finder-fe-app
     ports:
-      - "3000:80"      
+      - "3000:80" 
+         
