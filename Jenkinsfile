@@ -16,7 +16,7 @@ pipeline {
             }
         }
         
-        stage('Docker build') {
+        stage('Docker build and push images') {
             environment {
                 DOCKER_TAG="${GIT_BRANCH.tokenize('/').pop()}-${GIT_COMMIT.substring(0,7)}"
             }
@@ -26,7 +26,17 @@ pipeline {
                     echo DOCKER_TAG
                 }
                 sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKER_URL} . "
+                sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:dev-latest"
+                sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
                 sh "docker image ls | grep ${DOCKER_IMAGE}"
+                withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/') {
+                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker push ${DOCKER_IMAGE}:dev-latest"
+                    sh "docker push ${DOCKER_IMAGE}:latest"
+                }
+                sh "docker image rm ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                sh "docker image rm ${DOCKER_IMAGE}:dev-latest"
+                sh "docker image rm ${DOCKER_IMAGE}:latest"
             }
         }
 
@@ -37,15 +47,6 @@ pipeline {
                 }
             }
             steps {
-                sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:dev-latest"
-                sh "docker image ls | grep ${DOCKER_IMAGE}"
-
-                withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/') {
-                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                    sh "docker push ${DOCKER_IMAGE}:dev-latest"
-                }
-                sh "docker image rm ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                sh "docker image rm ${DOCKER_IMAGE}:dev-latest"
                 sh 'echo DEPLOY_DEV'
                 sh "ssh -i /var/jenkins_home/.ssh/feserver hoangsndxqn@34.142.135.202 './developFE.sh'"
             }
@@ -58,15 +59,6 @@ pipeline {
                 }
             }
             steps {
-                sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
-                sh "docker image ls | grep ${DOCKER_IMAGE}"
-
-                withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/') {
-                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                    sh "docker push ${DOCKER_IMAGE}:latest"
-                }
-                sh "docker image rm ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                sh "docker image rm ${DOCKER_IMAGE}:latest"
                 sh 'echo DEPLOY_RELEASE'
                 sh "ssh -i /var/jenkins_home/.ssh/feserver hoangsndxqn@34.142.135.202 './releaseFE.sh'"
             }
