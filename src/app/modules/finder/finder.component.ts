@@ -3,7 +3,10 @@ import { NotifyService } from '@app/shared/services/notify.service';
 import { finalize, map } from 'rxjs';
 import { SessionInfo } from '../models/session';
 import { FinderService } from '../services/finder.service';
-
+//
+import JSZip from "jszip";
+import * as FileSaver from 'file-saver';
+//
 @Component({
   selector: 'app-finder',
   templateUrl: './finder.component.html',
@@ -137,7 +140,26 @@ export class FinderComponent implements OnInit {
         );
     }
   }
+  //
+  saveZip = (filename, urls) => {
+    if (!urls) return;
 
+    const zip = new JSZip();
+    const folder = zip.folder('files'); // folder name where all files will be placed in
+
+    urls.forEach((url) => {
+      const blobPromise = fetch(url).then((r) => {
+        if (r.status === 200) return r.blob();
+        return Promise.reject(new Error(r.statusText));
+      });
+      const name = url.substring(url.lastIndexOf('/') + 1);
+      folder.file(name, blobPromise);
+    });
+
+    zip.generateAsync({ type: 'blob' }).then((blob) => FileSaver.saveAs(blob, filename));
+  };
+
+  //
   validate() {
     // validate valid url
     if (!this.isValidUrl(this.url.trim())) {
