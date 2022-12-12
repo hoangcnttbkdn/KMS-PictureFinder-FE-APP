@@ -57,6 +57,9 @@
       ],
       "@app/core/*": [
         "src/app/core/*"
+      ],
+      "jszip": [
+        "node_modules/jszip/dist/jszip.min.js"
       ]
     },
     "useDefineForClassFields": false

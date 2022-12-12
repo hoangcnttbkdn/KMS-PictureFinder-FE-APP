@@ -4,7 +4,10 @@ import { NotifyService } from '@app/shared/services/notify.service';
 import { finalize, map } from 'rxjs';
 import { SessionInfo } from '../models/session';
 import { FinderService } from '../services/finder.service';
-
+//
+import JSZip from 'jszip';
+import * as FileSaver from 'file-saver';
+//
 @Component({
   selector: 'app-finder-result',
   templateUrl: './finder-result.component.html',
@@ -13,10 +16,11 @@ import { FinderService } from '../services/finder.service';
 export class FinderResultComponent implements OnInit {
   imageFile: File;
   imagePreview: any;
-  images: [];
+  images: any[];
+  allImages: any[];
 
   sessionInfo: SessionInfo;
-  selectedType: string = 'drive';
+  selectedType: string = 'me';
   url: string = '';
   cookie: string = '';
   token: string = '';
@@ -38,6 +42,19 @@ export class FinderResultComponent implements OnInit {
     }
   }
 
+  onTypeChange() {
+    if (this.selectedType === 'me') {
+      this.images = Object.assign(
+        [],
+        this.allImages.filter((image) => image.isMatched)
+      );
+    } else {
+      this.images = Object.assign([], this.allImages);
+    }
+
+    console.log(this.images);
+  }
+
   getSessionInfo(sessionId: number) {
     if (sessionId) {
       let waiting = setInterval(() => {
@@ -47,7 +64,7 @@ export class FinderResultComponent implements OnInit {
             this.isLoadingSessionInfo = false;
           }
 
-          if (res.isFinished) {
+          if (res?.isFinished) {
             clearInterval(waiting);
             this.finderService
               .getImagesBySession(sessionId)
@@ -59,6 +76,7 @@ export class FinderResultComponent implements OnInit {
               .subscribe(
                 (res: any) => {
                   this.images = res.filter((image) => image.isMatched);
+                  this.allImages = res;
                 },
                 (err) => {
                   this.notifyService.showToast(err.error.message, 5000);
@@ -107,35 +125,29 @@ export class FinderResultComponent implements OnInit {
     }
   }
 
-  validate() {
-    // validate valid url
-    if (!this.isValidUrl(this.url.trim())) {
-      this.notifyService.showToast('Please enter a valid url', 3000);
-      return false;
-    }
-    // validate has targetImage
-    if (!this.imageFile) {
-      this.notifyService.showToast('Please select a target image', 3000);
-      return false;
-    }
-    // if type is facebook, validate has access token, cookie
-    if (
-      this.selectedType === 'facebook' &&
-      (this.token.trim() === '' || this.cookie.trim() === '')
-    ) {
-      this.notifyService.showToast(
-        'Please enter a valid token and cookie',
-        3000
-      );
-      return false;
-    }
-    return true;
+  downloadAllImages() {
+    this.saveZip('PictureFindor.zip', this.images);
   }
 
-  isValidUrl(url: string) {
-    const urlRegex =
-      /^((http|https|ftp|www):\/\/)?([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)(\.)([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]+)/g;
-    const result = url.match(urlRegex);
-    return result !== null;
-  }
+  //
+  saveZip = (filename, images) => {
+    const zip = new JSZip();
+    const folder = zip.folder('images'); // folder name where all files will be placed in
+
+    images.forEach((image) => {
+      const blobPromise = fetch(image.url).then((r) => {
+        if (r.status === 200) return r.blob();
+        return Promise.reject(new Error(r.statusText));
+      });
+      const name = image.url
+        .substring(image.url.lastIndexOf('/') + 1)
+        .split('?')[0];
+      folder.file(name, blobPromise);
+    });
+
+    zip
+      .generateAsync({ type: 'blob' })
+      .then((blob) => FileSaver.saveAs(blob, filename));
+  };
+
 }
