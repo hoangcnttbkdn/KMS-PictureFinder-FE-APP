@@ -1,10 +1,11 @@
 .finder-container {
-  min-height: calc(100vh - 70px);
+  min-height: calc(100vh - 45px);
   margin: auto;
   overflow-x: hidden;
 
   .finder-content {
     max-width: 1400px;
+    min-height: ̉60vh;
   }
 
   .image-wrapper {
