@@ -10,6 +10,7 @@ import { CardImageComponent } from './components/card-image/card-image.component
 import { FooterComponent } from './components/footer/footer.component';
 import { SkeletonComponent } from './components/skeleton/skeleton.component';
 import { ToastComponent } from './components/toast/toast.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 const COMPONENTS: any[] = [
   SearchBarComponent,
@@ -19,7 +20,8 @@ const COMPONENTS: any[] = [
   SkeletonComponent,
   FooterComponent,
   UploadImageComponent,
-  ToastComponent
+  ToastComponent,
+  NavbarComponent,
 ];
 
 @NgModule({

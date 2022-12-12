@@ -81,7 +81,7 @@ export class FinderComponent implements OnInit {
             this.sessionInfo = res;
             this.isInformPopupVisible = true;
           }
-          if (res.isFinished) {
+          if (res?.isFinished) {
             clearInterval(waiting);
             this.finderService
               .getImagesBySession(sessionId)
