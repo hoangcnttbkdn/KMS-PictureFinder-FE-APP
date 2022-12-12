@@ -1,5 +1,4 @@
 .finder-result-container {
-  min-height: calc(100vh - 70px);
   margin: auto;
 
   .image-wrapper {
@@ -7,7 +6,7 @@
   }
 
   .result-container {
-    min-height: 62vh;
+    min-height: calc(100vh - 130px);
     max-width: 1400px;
   }
 }

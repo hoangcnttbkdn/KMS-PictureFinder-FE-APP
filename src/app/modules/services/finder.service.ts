@@ -37,20 +37,23 @@ export class FinderService {
     albumUrl: string,
     targetImage: any,
     token: string,
-    cookie: string
+    cookie: string,
+    email: string,
   ): Observable<any> {
     const formData = new FormData();
     formData.append('albumUrl', albumUrl);
     formData.append('targetImage', targetImage);
     formData.append('accessToken', token);
     formData.append('cookie', cookie);
+    formData.append('email', email);
     return this.baseService.postForm<any>(`facebook`, formData);
   }
 
-  getDriveSession(folderUrl: string, targetImage: any): Observable<any> {
+  getDriveSession(folderUrl: string, targetImage: any, email: string,): Observable<any> {
     const formData = new FormData();
     formData.append('folderUrl', folderUrl);
     formData.append('targetImage', targetImage);
+    formData.append('email', email);
     return this.baseService.postForm<any>(`gg-drive`, formData);
   }
 

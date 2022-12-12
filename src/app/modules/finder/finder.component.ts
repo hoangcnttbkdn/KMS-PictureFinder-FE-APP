@@ -22,6 +22,7 @@ export class FinderComponent implements OnInit {
   url: string = '';
   cookie: string = '';
   token: string = '';
+  email: string = '';
   isLoading: boolean = false;
   isInformPopupVisible: boolean = true;
 
@@ -54,7 +55,7 @@ export class FinderComponent implements OnInit {
 
   getSession() {
     if (this.selectedType === 'drive') {
-      this.finderService.getDriveSession(this.url, this.imageFile).subscribe(
+      this.finderService.getDriveSession(this.url, this.imageFile, this.email).subscribe(
         (res: any) => {
           const sessionId = res.sessionId;
           this.getSessionInfo(sessionId);
@@ -65,7 +66,7 @@ export class FinderComponent implements OnInit {
       );
     } else {
       this.finderService
-        .getFacebokSession(this.url, this.imageFile, this.token, this.cookie)
+        .getFacebokSession(this.url, this.imageFile, this.token, this.cookie, this.email)
         .subscribe((res: any) => {
           const sessionId = res.sessionId;
           this.getSessionInfo(sessionId);
