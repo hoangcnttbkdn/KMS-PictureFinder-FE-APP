@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { CommonService } from '@app/core/services/common.service';
+import { Observable, Observer } from 'rxjs';
 
 @Component({
   selector: 'app-card-image',
@@ -7,26 +9,33 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class CardImageComponent implements OnInit {
   @Input() image: any;
-  constructor() {}
+  constructor(private commonService: CommonService) {}
 
   ngOnInit() {}
 
   viewFullScreen() {}
 
   downloadImage() {
-    const url = this.image.url;
-    fetch(url, {
-      mode: 'no-cors',
-    })
-      .then((response) => response.blob())
-      .then((blob) => {
-        let blobUrl = window.URL.createObjectURL(blob);
-        let a = document.createElement('a');
-        a.download = url.replace(/^.*[\\\/]/, '');
-        a.href = blobUrl;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+    const imageUrl = this.image.url;
+
+    this.commonService
+      .getBase64ImageFromURL(imageUrl)
+      .subscribe((base64data) => {
+        console.log(base64data);
+        const base64Image = 'data:image/jpg;base64,' + base64data;
+        var link = document.createElement('a');
+
+        document.body.appendChild(link);
+
+        link.setAttribute('href', base64Image);
+        const filename = this.image.code + '.jpg';
+        link.setAttribute('download', filename);
+        link.click();
       });
+  }
+
+  handleError(event: any) {
+    event.target.src = './assets/images/empty.png';
+    event.onerror = null;
   }
 }

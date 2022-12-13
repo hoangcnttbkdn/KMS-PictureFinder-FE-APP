@@ -9,10 +9,10 @@
     <section class="">
       <div class="lg:flex gap-5 mb-10 m-auto">
         <div
-          class="w-full px-4 lg:w-80 mb-5 flex flex-col justify-start items-center"
+          class="w-full px-4 lg:w-80 mb-5 flex flex-col justify-start items-center flex-shrink-0"
         >
           <div
-            class="w-full bg-white border border-gray-200 rounded-lg shadow-md "
+            class="w-full bg-white border border-gray-200 rounded-lg shadow-md"
           >
             <ng-container *ngIf="!isLoadingSessionInfo">
               <img
@@ -26,7 +26,7 @@
                 >
                   {{ sessionInfo.type }}
                 </span>
-                <span class="text-3xl font-bold text-gray-900 "
+                <span class="text-3xl font-bold text-gray-900"
                   >{{ sessionInfo.totalImages }} images
                 </span>
                 <a
@@ -51,7 +51,7 @@
                 </a>
               </div>
             </ng-container>
-            <app-skeleton *ngIf="isLoadingSessionInfo"> </app-skeleton>
+            <app-skeleton class="w-full" *ngIf="isLoadingSessionInfo"> </app-skeleton>
           </div>
           <div
             *ngIf="!isLoading && images?.length > 0"
@@ -60,7 +60,7 @@
             <button
               (click)="downloadAllImages()"
               type="button"
-              class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 "
+              class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
             >
               Download All
             </button>

@@ -4,7 +4,7 @@ import { finalize, map } from 'rxjs';
 import { SessionInfo } from '../models/session';
 import { FinderService } from '../services/finder.service';
 //
-import JSZip from "jszip";
+import JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 //
 @Component({
@@ -55,18 +55,26 @@ export class FinderComponent implements OnInit {
 
   getSession() {
     if (this.selectedType === 'drive') {
-      this.finderService.getDriveSession(this.url, this.imageFile, this.email).subscribe(
-        (res: any) => {
-          const sessionId = res.sessionId;
-          this.getSessionInfo(sessionId);
-        },
-        (err) => {
-          this.notifyService.showToast(err.error.message, 5000);
-        }
-      );
+      this.finderService
+        .getDriveSession(this.url, this.imageFile, this.email)
+        .subscribe(
+          (res: any) => {
+            const sessionId = res.sessionId;
+            this.getSessionInfo(sessionId);
+          },
+          (err) => {
+            this.notifyService.showToast(err.error.message, 5000);
+          }
+        );
     } else {
       this.finderService
-        .getFacebokSession(this.url, this.imageFile, this.token, this.cookie, this.email)
+        .getFacebokSession(
+          this.url,
+          this.imageFile,
+          this.token,
+          this.cookie,
+          this.email
+        )
         .subscribe((res: any) => {
           const sessionId = res.sessionId;
           this.getSessionInfo(sessionId);
@@ -141,26 +149,37 @@ export class FinderComponent implements OnInit {
         );
     }
   }
-  //
-  saveZip = (filename, urls) => {
-    if (!urls) return;
 
+  saveZip = (filename, images) => {
     const zip = new JSZip();
-    const folder = zip.folder('files'); // folder name where all files will be placed in
+    const folder = zip.folder('images'); // folder name where all files will be placed in
 
-    urls.forEach((url) => {
-      const blobPromise = fetch(url).then((r) => {
-        if (r.status === 200) return r.blob();
-        return Promise.reject(new Error(r.statusText));
-      });
-      const name = url.substring(url.lastIndexOf('/') + 1);
+    images.forEach((image) => {
+      const blobPromise = fetch(image.url)
+        .then((r) => {
+          if (r.status === 200) return r.blob();
+          return Promise.reject(new Error(r.statusText));
+        })
+        .catch((err) => {
+          this.notifyService.showToast('Fail to download images', 5000);
+        });
+      let name = image.url
+        .substring(image.url.lastIndexOf('/') + 1)
+        .split('?')[0];
+
+      // if name not contains jpg, png, jpeg then add .jpg
+      if (!name.match(/\.(jpg|png|jpeg)$/)) {
+        name += '.jpg';
+      }
+      //
       folder.file(name, blobPromise);
     });
 
-    zip.generateAsync({ type: 'blob' }).then((blob) => FileSaver.saveAs(blob, filename));
+    zip
+      .generateAsync({ type: 'blob' })
+      .then((blob) => FileSaver.saveAs(blob, filename));
   };
 
-  //
   validate() {
     // validate valid url
     if (!this.isValidUrl(this.url.trim())) {
