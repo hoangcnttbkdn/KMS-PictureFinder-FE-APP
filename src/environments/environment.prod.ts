@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  baseUrl: 'http://34.143.233.85/api',
+  baseUrl: 'http://be.picturesfinder.software/api',
+  // baseUrl: 'http://35.240.135.215/api',
 };
