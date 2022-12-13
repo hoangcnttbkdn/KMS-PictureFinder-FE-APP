@@ -138,10 +138,19 @@ export class FinderResultComponent implements OnInit {
       const blobPromise = fetch(image.url).then((r) => {
         if (r.status === 200) return r.blob();
         return Promise.reject(new Error(r.statusText));
+      })
+      .catch((err) => {
+        this.notifyService.showToast('Fail to download images', 5000);
       });
-      const name = image.url
+      let name = image.url
         .substring(image.url.lastIndexOf('/') + 1)
         .split('?')[0];
+
+      // if name not contains jpg, png, jpeg then add .jpg
+      if (!name.match(/\.(jpg|png|jpeg)$/)) {
+        name += '.jpg';
+      }
+      //
       folder.file(name, blobPromise);
     });
 
@@ -149,5 +158,4 @@ export class FinderResultComponent implements OnInit {
       .generateAsync({ type: 'blob' })
       .then((blob) => FileSaver.saveAs(blob, filename));
   };
-
 }
