@@ -1,3 +1,0 @@
-FROM nginx as production-stage
-RUN mkdir /app
-COPY --from=appbuild /app/dist/finder /usr/share/nginx/html
