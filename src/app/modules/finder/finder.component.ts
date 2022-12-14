@@ -23,7 +23,7 @@ export class FinderComponent implements OnInit {
   imagePreview: any;
   images: Image[];
   selectedType: FinderType = FinderType.Drive;
-  
+
   url: string = '';
   cookie: string = '';
   token: string = '';
@@ -64,15 +64,22 @@ export class FinderComponent implements OnInit {
           targetImage: this.imageFile,
           email: this.email,
         });
-        this.finderService.getDriveSession(this.drive).subscribe(
-          (res: any) => {
-            const sessionId = res.sessionId;
-            this.getSessionInfo(sessionId);
-          },
-          (err) => {
-            this.notifyService.showToast(err.error.message, 5000);
-          }
-        );
+        this.finderService
+          .getDriveSession(this.drive)
+          .pipe(
+            finalize(() => {
+              this.isLoading = false;
+            })
+          )
+          .subscribe(
+            (res: any) => {
+              const sessionId = res.sessionId;
+              this.getSessionInfo(sessionId);
+            },
+            (err) => {
+              this.notifyService.showToast(err.error.message, 5000);
+            }
+          );
         break;
       case FinderType.Facebook:
         this.facebook = new FacebookRequest({
@@ -80,13 +87,24 @@ export class FinderComponent implements OnInit {
           cookie: this.cookie,
           token: this.token,
           targetImage: this.imageFile,
+          email: this.email,
         });
         this.finderService
           .getFacebokSession(this.facebook)
-          .subscribe((res: any) => {
-            const sessionId = res.sessionId;
-            this.getSessionInfo(sessionId);
-          });
+          .pipe(
+            finalize(() => {
+              this.isLoading = false;
+            })
+          )
+          .subscribe(
+            (res: any) => {
+              const sessionId = res.sessionId;
+              this.getSessionInfo(sessionId);
+            },
+            (err) => {
+              this.notifyService.showToast(err.error.message, 5000);
+            }
+          );
         break;
 
       default:
@@ -208,9 +226,16 @@ export class FinderComponent implements OnInit {
   };
 
   validate() {
+    // validate email
+    if (this.email !== '') {
+      if (!this.isValidEmail(this.email.trim())) {
+        this.notifyService.showToast('Email is invalid', 3000);
+        return false;
+      }
+    }
     // validate valid url
     if (!this.isValidUrl(this.url.trim())) {
-      this.notifyService.showToast('Please enter a valid url', 3000);
+      this.notifyService.showToast('Url is invalid', 3000);
       return false;
     }
     // validate has targetImage
@@ -237,5 +262,11 @@ export class FinderComponent implements OnInit {
       /^((http|https|ftp|www):\/\/)?([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)(\.)([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]+)/g;
     const result = url.match(urlRegex);
     return result !== null;
+  }
+
+  isValidEmail(email) {
+    return email.match(
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
   }
 }
