@@ -37,7 +37,6 @@ pipeline {
                 sh "docker image rm ${DOCKER_IMAGE}:${DOCKER_TAG}"
                 sh "docker image rm ${DOCKER_IMAGE}:dev-latest"
                 sh "docker image rm ${DOCKER_IMAGE}:latest"
-                sh 'docker system prune -f'
             }
         }
 
@@ -65,12 +64,13 @@ pipeline {
             }
         }
     }
+
     post {
-        success {
-            echo "SUCCESSFUL"
-        }
-        failure {
-            echo "FAILED"
-        }
+    success {
+      echo "SUCCESSFUL"
     }
+    failure {
+      echo "FAILED"
+    }
+  }
 }
