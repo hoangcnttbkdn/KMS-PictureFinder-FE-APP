@@ -1,0 +1,244 @@
+<div class="finder-container">
+  <app-header
+    class="w-1/2 text-center"
+    [description]="
+      'Enter url or upload image to find similar images.If you enter your email, the results will be sent to you when request session is completed.'
+    "
+  >
+  </app-header>
+  <section class="finder-content m-auto px-3">
+    <div class="flex flex-wrap justify-center gap-2 mb-5">
+      <ul class="flex gap-2 justify-center md:justify-end">
+        <li>
+          <input
+            type="radio"
+            id="hosting-small"
+            name="selectedType"
+            [(ngModel)]="selectedType"
+            [value]="FinderType.Drive"
+            class="hidden peer"
+            required
+          />
+          <label
+            for="hosting-small"
+            class="inline-flex justify-between items-center p-1 text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:shadow-md hover:text-gray-600 hover:bg-gray-100"
+          >
+            <img
+              class="h-10 w-10 rounded-full shadow-sm"
+              src="./assets/images/drive.png"
+            />
+          </label>
+        </li>
+        <li>
+          <input
+            type="radio"
+            id="hosting-big"
+            name="selectedType"
+            [(ngModel)]="selectedType"
+            [value]="FinderType.Facebook"
+            class="hidden peer"
+          />
+          <label
+            for="hosting-big"
+            class="inline-flex justify-between items-center p-1 text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:shadow-md hover:text-gray-600 hover:bg-gray-100"
+          >
+            <img
+              class="h-10 w-10 rounded-full shadow-sm"
+              src="./assets/images/facebook.png"
+            />
+          </label>
+        </li>
+      </ul>
+      <input
+        class="w-full lg:w-1/5 focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 px-5 ring-1 ring-slate-200 shadow-sm"
+        type="text"
+        [disabled]="isLoading"
+        [(ngModel)]="email"
+        [ngModelOptions]="{ standalone: true }"
+        aria-label="Enter email"
+        placeholder="Enter email..."
+      />
+
+      <form class="group relative flex-1">
+        <input
+          [disabled]="isLoading"
+          class="focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 pl-5 pr-10 ring-1 ring-slate-200 shadow-sm"
+          type="text"
+          [(ngModel)]="url"
+          [ngModelOptions]="{ standalone: true }"
+          aria-label="Enter url"
+          placeholder="Enter url..."
+        />
+
+        <button
+          [disabled]="!url || isLoading || !imageFile"
+          class="absolute right-1 top-1/2 -mt-5 cursor-pointer"
+          (click)="onSearchButtonClicked()"
+        >
+          <a
+            class="hover:bg-indigo-400 group flex items-center rounded-md bg-indigo-500 text-white text-sm font-medium px-3 py-[9px] shadow-sm"
+          >
+            <svg
+              width="20"
+              height="20"
+              fill="currentColor"
+              class="text-white pointer-events-none"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+              />
+            </svg>
+          </a>
+        </button>
+      </form>
+    </div>
+    <div
+      *ngIf="selectedType === FinderType.Facebook"
+      class="flex flex-wrap md:flex-nowrap gap-4 mb-5"
+    >
+      <input
+        class="w-full focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 px-5 ring-1 ring-slate-200 shadow-sm"
+        type="text"
+        [disabled]="isLoading"
+        [(ngModel)]="cookie"
+        [ngModelOptions]="{ standalone: true }"
+        aria-label="Enter cookie"
+        placeholder="Enter cookie..."
+      />
+      <input
+        class="w-full focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 px-5 ring-1 ring-slate-200 shadow-sm"
+        type="text"
+        [disabled]="isLoading"
+        [(ngModel)]="token"
+        [ngModelOptions]="{ standalone: true }"
+        aria-label="Enter token"
+        placeholder="Enter token..."
+      />
+    </div>
+
+    <div class="lg:flex gap-5 mb-10">
+      <div class="lg:w-1/5 mb-5 flex-shrink-0">
+        <img
+          *ngIf="imagePreview"
+          [src]="imagePreview"
+          class="w-full h-52 rounded-md shadow-md mb-2 object-cover"
+        />
+        <app-upload-image
+          [isLoading]="isLoading"
+          [onlyButton]="imagePreview"
+          (onImageUploaded)="onImageUploaded($event)"
+        ></app-upload-image>
+
+        <a
+          *ngIf="sessionInfo"
+          [routerLink]="['/result/' + sessionInfo.id]"
+          target="_blank"
+          class="inline-flex items-center text-blue-600 hover:underline mt-3"
+        >
+          Link to result page
+          <svg
+            class="w-5 h-5 ml-2"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"
+            ></path>
+            <path
+              d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"
+            ></path>
+          </svg>
+        </a>
+      </div>
+
+      <div
+        *ngIf="!isLoading; else skeleton"
+        class="lg:w-4/5 flex flex-wrap justify-start gap-y-12 pl-5"
+      >
+        <app-image-gallery class="w-full " [images]="images"></app-image-gallery>
+      </div>
+
+      <ng-template #skeleton>
+        <div class="flex gap-2 justify-center w-full">
+          <app-skeleton> </app-skeleton>
+          <app-skeleton class="hidden md:block"> </app-skeleton>
+          <app-skeleton class="hidden sm:block"> </app-skeleton>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+</div>
+
+<!-- popup -->
+<ng-container *ngIf="sessionInfo && isInformPopupVisible">
+  <div class="overlay overlay-active">
+    <div class="popup">
+      <div class="flex gap-3 items-center justify-between">
+        <h2 class="font-bold">Warning</h2>
+        <button
+          (click)="isInformPopupVisible = false"
+          type="button"
+          class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+        >
+          <span class="sr-only">Close menu</span>
+          <svg
+            class="h-6 w-6"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div class="content">
+        This process will take a long time to detech all images. Please wait for
+        a while. Or save this link to your browser and come back later.
+      </div>
+
+      <a
+        [href]="'/result/' + sessionInfo.id"
+        target="_blank"
+        class="inline-flex items-center text-blue-600 hover:underline"
+      >
+        Link to view result
+        <svg
+          class="w-5 h-5 ml-2"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"
+          ></path>
+          <path
+            d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"
+          ></path>
+        </svg>
+      </a>
+
+      <div class="mt-2 flex justify-end">
+        <button
+          (click)="isInformPopupVisible = false"
+          data-modal-toggle="staticModal"
+          type="button"
+          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-container>

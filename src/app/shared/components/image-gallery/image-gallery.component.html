@@ -1,0 +1,29 @@
+<div class="w-full flex flex-wrap justify-start gap-y-12 pl-5">
+  <ng-container *ngIf="!!images && images.length > 0">
+    <div
+      *ngFor="let item of images; let index = index"
+      class="relative image-wrapper"
+    >
+      <app-card-image
+        [image]="item"
+        (onImageClicked)="onImageClicked($event, index)"
+      ></app-card-image>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!!images && images.length === 0">
+    <div class="flex flex-col items-center">
+      <img src="assets/images/empty.png" class="w-1/2 h-1/2 object-contain" />
+      <p class="text-gray-500 text-sm">No images found</p>
+    </div>
+  </ng-container>
+</div>
+
+<app-fullscreen-viewer
+  [image]="selectedImage"
+  [open]="isViewerOpen"
+  (close)="isViewerOpen = false"
+  (onDownload)="downloadImage($event)"
+  (onPrev)="changeSelectedImage(NavigationType.Previous)"
+  (onNext)="changeSelectedImage(NavigationType.Next)"
+></app-fullscreen-viewer>

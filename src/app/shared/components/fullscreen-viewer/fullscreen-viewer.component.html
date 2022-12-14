@@ -1,0 +1,96 @@
+<div *ngIf="open" class="viewer-container">
+  <div class="viewer-content">
+    <img class="main-img" [src]="image.url" />
+    <div class="absolute top-0 right-0 m-3 flex gap-2">
+      <button
+        *ngIf="isShowOptionButton"
+        (click)="onDownload.emit(image)"
+        type="button"
+        class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+      >
+        <span class="sr-only">Download</span>
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+          ></path>
+        </svg>
+      </button>
+      <button
+        (click)="close.emit()"
+        type="button"
+        class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+      >
+        <span class="sr-only">Close</span>
+        <svg
+          class="h-6 w-6"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div
+      *ngIf="isShowOptionButton"
+      class="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-3"
+    >
+      <div
+        class="w-10 h-10 rounded-full flex justify-center items-center hover:bg-slate-700 cursor-pointer"
+        (click)="onPrev.emit()"
+      >
+        <svg
+          class="w-6 h-6 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+      </div>
+
+      <div
+        class="w-10 h-10 rounded-full flex justify-center items-center hover:bg-slate-700 cursor-pointer"
+        (click)="onNext.emit()"
+      >
+        <svg
+          class="w-6 h-6 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          ></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>

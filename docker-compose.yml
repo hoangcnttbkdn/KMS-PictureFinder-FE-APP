@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      dockerfile: docker/Dockerfile.prod
+      context: .
+    image: kms-picture-finder-fe-app
+    ports:
+      - "3000:80" 
+         
