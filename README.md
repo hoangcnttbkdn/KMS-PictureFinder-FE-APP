@@ -1,4 +1,4 @@
-# ✨ Picture Finder ✨ 
+# ✨ Pictures Finder ✨ 
 [Visit website]( http://picturesfinder.software/)
 
 ## 🔥 About this project
