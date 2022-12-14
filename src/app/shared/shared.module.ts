@@ -5,7 +5,6 @@ import { RouterModule } from '@angular/router';
 // components
 import { UploadImageComponent } from './components/upload-image/upload-image.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
-import { SelectBoxComponent } from './components/select-box/select-box.component';
 import { CardImageComponent } from './components/card-image/card-image.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { SkeletonComponent } from './components/skeleton/skeleton.component';
@@ -14,7 +13,6 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 
 const COMPONENTS: any[] = [
   SearchBarComponent,
-  SelectBoxComponent,
   CardImageComponent,
   FooterComponent,
   SkeletonComponent,
