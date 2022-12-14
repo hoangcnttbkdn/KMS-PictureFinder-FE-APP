@@ -1,3 +1,4 @@
+import { FinderSessionComponent } from './modules/finder-session/finder-session.component';
 import { FinderResultComponent } from './modules/finder-result/finder-result.component';
 import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
@@ -8,6 +9,10 @@ const routes: Routes = [
   {
     path: '',
     component: FinderComponent,
+  },
+  {
+    path: 'result',
+    component: FinderSessionComponent,
   },
   {
     path: 'result/:sessionId',

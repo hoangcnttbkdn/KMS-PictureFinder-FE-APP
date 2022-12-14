@@ -1,3 +1,4 @@
+import { FinderSessionComponent } from './modules/finder-session/finder-session.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -11,7 +12,7 @@ import { FinderResultComponent } from './modules/finder-result/finder-result.com
 import { FinderComponent } from './modules/finder/finder.component';
 import { SharedModule } from './shared/shared.module';
 
-const COMPONENTS = [FinderComponent, FinderResultComponent];
+const COMPONENTS = [FinderComponent, FinderResultComponent, FinderSessionComponent];
 
 @NgModule({
   declarations: [...COMPONENTS, AppComponent],

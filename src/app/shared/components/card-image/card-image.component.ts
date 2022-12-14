@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonService } from '@app/core/services/common.service';
-import { Observable, Observer } from 'rxjs';
 
 @Component({
   selector: 'app-card-image',
@@ -14,8 +13,6 @@ export class CardImageComponent implements OnInit {
   constructor(private commonService: CommonService) {}
 
   ngOnInit() {}
-
-  viewFullScreen() {}
 
   handleImageClicked(image) {
     this.onImageClicked.emit(image);
