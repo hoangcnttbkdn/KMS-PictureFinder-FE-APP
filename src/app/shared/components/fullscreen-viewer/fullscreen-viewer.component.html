@@ -3,6 +3,7 @@
     <img class="main-img" [src]="image.url" />
     <div class="absolute top-0 right-0 m-3 flex gap-2">
       <button
+        *ngIf="isShowOptionButton"
         (click)="onDownload.emit(image)"
         type="button"
         class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
@@ -48,6 +49,7 @@
     </div>
 
     <div
+      *ngIf="isShowOptionButton"
       class="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-3"
     >
       <div

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NotifyService } from '@app/shared/services/notify.service';
-import { finalize, map } from 'rxjs';
+import { finalize } from 'rxjs';
 import { FinderService } from '../services/finder.service';
 //
 import JSZip from 'jszip';
@@ -10,6 +10,8 @@ import { FacebookRequest } from '../models/facebook-request.model';
 import { FinderType } from '@app/shared/enums/finder-type.enum';
 import { SessionInfo } from '../models/session.model';
 import { Image } from '../models/image.model';
+import { NavigationType } from '@app/shared/enums/navigation-type.enum';
+import { CommonService } from '@app/core/services/common.service';
 //
 @Component({
   selector: 'app-finder',
@@ -18,6 +20,7 @@ import { Image } from '../models/image.model';
 })
 export class FinderComponent implements OnInit {
   FinderType = FinderType;
+  NavigationType = NavigationType;
 
   imageFile: File;
   imagePreview: any;
@@ -38,7 +41,7 @@ export class FinderComponent implements OnInit {
 
   constructor(
     private finderService: FinderService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
   ) {}
 
   ngOnInit() {}
@@ -66,17 +69,13 @@ export class FinderComponent implements OnInit {
         });
         this.finderService
           .getDriveSession(this.drive)
-          .pipe(
-            finalize(() => {
-              this.isLoading = false;
-            })
-          )
           .subscribe(
             (res: any) => {
               const sessionId = res.sessionId;
               this.getSessionInfo(sessionId);
             },
             (err) => {
+              this.isLoading = false;
               this.notifyService.showToast(err.error.message, 5000);
             }
           );
@@ -124,16 +123,13 @@ export class FinderComponent implements OnInit {
             clearInterval(waiting);
             this.finderService
               .getImagesBySession(sessionId)
-              .pipe(
-                finalize(() => {
-                  this.isLoading = false;
-                })
-              )
               .subscribe(
                 (res: any) => {
                   this.images = res.filter((image) => image.isMatched);
+                  this.isLoading = false;
                 },
                 (err) => {
+                  this.isLoading = false;
                   this.notifyService.showToast(err.error.message, 5000);
                 }
               );

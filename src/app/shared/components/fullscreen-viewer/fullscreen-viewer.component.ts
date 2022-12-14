@@ -12,6 +12,7 @@ import {
   styleUrls: ['./fullscreen-viewer.component.scss'],
 })
 export class FullscreenViewerComponent {
+  @Input() isShowOptionButton: boolean = true;
   @Input() open: boolean;
   @Input() image: any;
 

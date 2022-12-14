@@ -12,6 +12,8 @@ import { ToastComponent } from './components/toast/toast.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FullscreenViewerComponent } from './components/fullscreen-viewer/fullscreen-viewer.component';
+import { ImageGalleryComponent } from './components/image-gallery/image-gallery.component';
+import { DownloadImageButtonComponent } from './components/download-image-button/download-image-button.component';
 
 const COMPONENTS: any[] = [
   SearchBarComponent,
@@ -23,7 +25,9 @@ const COMPONENTS: any[] = [
   ToastComponent,
   NavbarComponent,
   HeaderComponent,
-  FullscreenViewerComponent
+  FullscreenViewerComponent,
+  ImageGalleryComponent,
+  DownloadImageButtonComponent
 ];
 
 @NgModule({
