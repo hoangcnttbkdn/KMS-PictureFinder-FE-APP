@@ -8,8 +8,11 @@ import { BaseService } from './base.service';
   providedIn: 'root',
 })
 export class CommonService {
-  constructor(private baseService: BaseService, private notifyService: NotifyService) {}
-  
+  constructor(
+    private baseService: BaseService,
+    private notifyService: NotifyService
+  ) {}
+
   getBase64ImageFromURL(url: string) {
     return Observable.create((observer: Observer<string>) => {
       const img: HTMLImageElement = new Image();
@@ -40,5 +43,17 @@ export class CommonService {
     const dataURL: string = canvas.toDataURL('image/png');
 
     return dataURL.replace(/^data:image\/(png|jpg);base64,/, '');
+  }
+
+  downloadImage(base64data, name) {
+    const base64Image = 'data:image/jpg;base64,' + base64data;
+    var link = document.createElement('a');
+
+    document.body.appendChild(link);
+
+    link.setAttribute('href', base64Image);
+    const filename = name + '.jpg';
+    link.setAttribute('download', filename);
+    link.click();
   }
 }

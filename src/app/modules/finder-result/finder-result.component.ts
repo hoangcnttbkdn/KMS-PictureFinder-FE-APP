@@ -1,12 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NotifyService } from '@app/shared/services/notify.service';
 import { finalize, map } from 'rxjs';
-import { SessionInfo } from '../models/session';
-import { FinderService } from '../services/finder.service';
-//
-import JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
+import JSZip from 'jszip';
+//
+import { NavigationType } from '@app/shared/enums/navigation-type.enum';
+
+import { FinderService } from '../services/finder.service';
+import { NotifyService } from '@app/shared/services/notify.service';
+import { CommonService } from '@app/core/services/common.service';
+
+import { SessionInfo } from '../models/session.model';
+import { FacebookRequest } from './../models/facebook-request.model';
+import { DriveRequest } from '../models/drive-request.model';
+import { Image } from '../models/image.model';
+import { FinderType } from '@app/shared/enums/finder-type.enum';
 //
 @Component({
   selector: 'app-finder-result',
@@ -14,10 +22,11 @@ import * as FileSaver from 'file-saver';
   styleUrls: ['./finder-result.component.scss'],
 })
 export class FinderResultComponent implements OnInit {
+  NavigationType = NavigationType;
   imageFile: File;
   imagePreview: any;
-  images: any[];
-  allImages: any[];
+  images: Image[];
+  allImages: Image[];
 
   sessionInfo: SessionInfo;
   selectedType: string = 'me';
@@ -26,10 +35,17 @@ export class FinderResultComponent implements OnInit {
   token: string = '';
   isLoading: boolean = false;
   isLoadingSessionInfo: boolean = true;
+  isViewerOpen: boolean = false;
+  selectedImage: any;
+  selectedIndex: number;
+
+  facebook: FacebookRequest = new FacebookRequest();
+  drive: DriveRequest = new DriveRequest();
 
   constructor(
     private finderService: FinderService,
     private notifyService: NotifyService,
+    private commonService: CommonService,
     private route: ActivatedRoute
   ) {}
 
@@ -88,69 +104,72 @@ export class FinderResultComponent implements OnInit {
     }
   }
 
-  findImages() {
-    if (this.selectedType === 'drive') {
-      this.finderService
-        .findImagesFromDriveByOne(this.url, this.imageFile)
-        .pipe(
-          finalize(() => {
-            this.isLoading = false;
-          })
-        )
-        .subscribe(
-          (res: any) => {
-            this.images = res;
-          },
-          (err) => {
-            this.notifyService.showToast(err.error.message, 5000);
-          }
-        );
-    } else {
-      this.finderService
-        .findImagesFromFacebookByOne(
-          this.url,
-          this.imageFile,
-          this.token,
-          this.cookie
-        )
-        .pipe(finalize(() => (this.isLoading = false)))
-        .subscribe(
-          (res: any) => {
-            this.images = res;
-          },
-          (err) => {
-            this.notifyService.showToast(err.error.message, 5000);
-          }
-        );
+  //
+  onImageClicked(image, index) {
+    this.selectedIndex = index;
+    this.selectedImage = image;
+    this.isViewerOpen = true;
+  }
+
+  changeSelectedImage(type: string) {
+    switch (type) {
+      case NavigationType.Previous:
+        if (this.selectedIndex === 0) {
+          this.selectedIndex = this.images.length - 1;
+        } else {
+          this.selectedIndex--;
+        }
+
+        break;
+      case NavigationType.Next:
+        if (this.selectedIndex === this.images.length - 1) {
+          this.selectedIndex = 0;
+        } else {
+          this.selectedIndex++;
+        }
+        console.log(this.selectedIndex);
+
+        break;
+      default:
+        break;
     }
+    this.selectedImage = this.images[this.selectedIndex];
+  }
+
+  //#region Handle download images
+  downloadImage(image: any) {
+    this.commonService
+      .getBase64ImageFromURL(image.url)
+      .subscribe((base64data) => {
+        this.commonService.downloadImage(base64data, image.code);
+      });
   }
 
   downloadAllImages() {
     this.saveZip('PictureFindor.zip', this.images);
   }
 
-  //
   saveZip = (filename, images) => {
     const zip = new JSZip();
-    const folder = zip.folder('images'); // folder name where all files will be placed in
+    const folder = zip.folder('images'); // folder name
 
     images.forEach((image) => {
-      const blobPromise = fetch(image.url).then((r) => {
-        if (r.status === 200) return r.blob();
-        return Promise.reject(new Error(r.statusText));
-      })
-      .catch((err) => {
-        this.notifyService.showToast('Fail to download images', 5000);
-      });
+      const blobPromise = fetch(image.url)
+        .then((r) => {
+          if (r.status === 200) return r.blob();
+          return Promise.reject(new Error(r.statusText));
+        })
+        .catch(() => {
+          this.notifyService.showToast('Fail to download images', 5000);
+        });
       let name = image.url
         .substring(image.url.lastIndexOf('/') + 1)
         .split('?')[0];
 
-      // if name not contains jpg, png, jpeg then add .jpg
+      // handle if name not contains jpg, png, jpeg then add .jpg
       if (!name.match(/\.(jpg|png|jpeg)$/)) {
         name += '.jpg';
       }
-      //
       folder.file(name, blobPromise);
     });
 
@@ -158,4 +177,5 @@ export class FinderResultComponent implements OnInit {
       .generateAsync({ type: 'blob' })
       .then((blob) => FileSaver.saveAs(blob, filename));
   };
+  //#endregion
 }

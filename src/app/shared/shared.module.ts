@@ -10,6 +10,8 @@ import { FooterComponent } from './components/footer/footer.component';
 import { SkeletonComponent } from './components/skeleton/skeleton.component';
 import { ToastComponent } from './components/toast/toast.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { HeaderComponent } from './components/header/header.component';
+import { FullscreenViewerComponent } from './components/fullscreen-viewer/fullscreen-viewer.component';
 
 const COMPONENTS: any[] = [
   SearchBarComponent,
@@ -20,6 +22,8 @@ const COMPONENTS: any[] = [
   UploadImageComponent,
   ToastComponent,
   NavbarComponent,
+  HeaderComponent,
+  FullscreenViewerComponent
 ];
 
 @NgModule({

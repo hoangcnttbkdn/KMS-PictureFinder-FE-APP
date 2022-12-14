@@ -1,9 +1,9 @@
 <div>
   <div class="card-container h-56 w-11/12 relative shadow-lg rounded-md">
     <div class="overlay"></div>
-    <div class="content-wrapper">
+    <div class="content-wrapper" (click)="handleImageClicked(image)">
       <div class="image-wrapper rounded-md">
-        <img [src]="image.url" srcset="" (error)="handleError($event)"/>
+        <img [src]="image.url" (error)="handleError($event)" />
       </div>
       <div class="info-wrapper flex justify-between items-end text-white">
         <div class="ml-auto flex gap-2 p-2">
@@ -23,7 +23,7 @@
             />
           </svg>
           </a> -->
-          <a class="text-white cursor-pointer" (click)="downloadImage()">
+          <a class="text-white cursor-pointer" (click)="downloadImage($event)">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
