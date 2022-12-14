@@ -1,4 +1,8 @@
 <div class="app-container">
-  <router-outlet></router-outlet>
+  <app-navbar class="navbar bg-white z-50" [shadow]="!isOnTop"></app-navbar>
+  <div class="app-content">
+    <router-outlet></router-outlet>
+  </div>
+  <app-footer class="footer" class="mt-10"></app-footer>
 </div>
 <app-toast></app-toast>

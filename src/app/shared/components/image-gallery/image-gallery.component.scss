@@ -1,0 +1,22 @@
+.image-wrapper {
+  width: 33%;
+}
+
+@media screen and (max-width: 768px) {
+  .image-wrapper {
+    width: 50%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .image-wrapper {
+    width: 100%;
+  }
+}
+
+
+@media screen and (min-width: 2000px ) {
+  .image-wrapper {
+    width: 25%;
+  }
+}

@@ -1,6 +1,10 @@
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { BaseService } from '@app/core/services/base.service';
+import { FacebookRequest } from '../models/facebook-request.model';
+import { DriveRequest } from '../models/drive-request.model';
+import { SessionInfo, SessionRequest } from '../models/session.model';
+import { Image } from '../models/image.model';
 
 @Injectable({
   providedIn: 'root',
@@ -8,60 +12,46 @@ import { BaseService } from '@app/core/services/base.service';
 export class FinderService {
   constructor(private baseService: BaseService) {}
 
-  findImagesFromFacebookByOne(
-    albumUrl: string,
-    targetImage: any,
-    token: string,
-    cookie: string
-  ): Observable<any> {
+  findImagesFromFacebookByOne(data: FacebookRequest): Observable<any> {
     const formData = new FormData();
-    formData.append('albumUrl', albumUrl);
-    formData.append('targetImage', targetImage);
-    formData.append('accessToken', token);
-    formData.append('cookie', cookie);
+    formData.append('albumUrl', data.albumUrl);
+    formData.append('targetImage', data.targetImage);
+    formData.append('accessToken', data.token);
+    formData.append('cookie', data.cookie);
     return this.baseService.postForm<any>(`facebook`, formData);
   }
 
-  findImagesFromDriveByOne(
-    folderUrl: string,
-    targetImage: any
-  ): Observable<any> {
+  findImagesFromDriveByOne(data: DriveRequest): Observable<any> {
     const formData = new FormData();
-    formData.append('folderUrl', folderUrl);
-    formData.append('targetImage', targetImage);
+    formData.append('folderUrl', data.folderUrl);
+    formData.append('targetImage', data.targetImage);
     return this.baseService.postForm<any>(`gg-drive`, formData);
   }
 
-  // updated
-  getFacebokSession(
-    albumUrl: string,
-    targetImage: any,
-    token: string,
-    cookie: string,
-    email: string,
-  ): Observable<any> {
+  getFacebokSession(data: FacebookRequest): Observable<any> {
     const formData = new FormData();
-    formData.append('albumUrl', albumUrl);
-    formData.append('targetImage', targetImage);
-    formData.append('accessToken', token);
-    formData.append('cookie', cookie);
-    formData.append('email', email);
+    formData.append('albumUrl', data.albumUrl);
+    formData.append('targetImage', data.targetImage);
+    formData.append('accessToken', data.token);
+    formData.append('cookie', data.cookie);
+    formData.append('email', data.email);
     return this.baseService.postForm<any>(`facebook`, formData);
   }
 
-  getDriveSession(folderUrl: string, targetImage: any, email: string,): Observable<any> {
+  getDriveSession(data: DriveRequest
+  ): Observable<any> {
     const formData = new FormData();
-    formData.append('folderUrl', folderUrl);
-    formData.append('targetImage', targetImage);
-    formData.append('email', email);
+    formData.append('folderUrl', data.folderUrl);
+    formData.append('targetImage', data.targetImage);
+    formData.append('email', data.email);
     return this.baseService.postForm<any>(`gg-drive`, formData);
   }
 
-  getInfoBySession(sessionId: number): Observable<any> {
-    return this.baseService.get<any>(`sessions/${sessionId}`);
+  getInfoBySession(sessionId: number): Observable<SessionInfo> {
+    return this.baseService.get<SessionInfo>(`sessions/${sessionId}`);
   }
 
-  getImagesBySession(sessionId: number): Observable<any> {
-    return this.baseService.get<any>(`sessions/${sessionId}/images`);
+  getImagesBySession(sessionId: number): Observable<Image> {
+    return this.baseService.get<Image>(`sessions/${sessionId}/images`);
   }
 }
