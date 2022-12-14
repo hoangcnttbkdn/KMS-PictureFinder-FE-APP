@@ -1,4 +1,19 @@
+$navbar: 57px;
+$footer: 45px;
+
 .app-container {
-    min-height: 100vh;
-    overflow-x: hidden;
+  min-height: 100vh;
+
+  .navbar {
+    height: $navbar;
+  }
+  
+  .app-content {
+    height: fit-content;
+    min-height: calc(100vh - $navbar - $footer);
+  }
+
+  .footer {
+    height: $footer;
+  }
 }
