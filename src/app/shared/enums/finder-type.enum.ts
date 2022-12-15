@@ -1,5 +1,5 @@
-export enum FinderType {
-    Drive = 'drive',
+export enum SocialType {
+    Drive = 'gg-drive',
     Facebook = 'facebook'
 }
 

@@ -8,11 +8,10 @@ import JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import { DriveRequest } from '../models/drive-request.model';
 import { FacebookRequest } from '../models/facebook-request.model';
-import { FinderByType, FinderType } from '@app/shared/enums/finder-type.enum';
+import { FinderByType, SocialType } from '@app/shared/enums/finder-type.enum';
 import { SessionInfo } from '../models/session.model';
 import { Image } from '../models/image.model';
 import { NavigationType } from '@app/shared/enums/navigation-type.enum';
-import { CommonService } from '@app/core/services/common.service';
 //
 @Component({
   selector: 'app-finder',
@@ -20,7 +19,7 @@ import { CommonService } from '@app/core/services/common.service';
   styleUrls: ['./finder.component.scss'],
 })
 export class FinderComponent implements OnInit {
-  FinderType = FinderType;
+  SocialType = SocialType;
   NavigationType = NavigationType;
   FinderByType = FinderByType;
   FINDER_TYPES = FINDER_TYPES;
@@ -28,7 +27,7 @@ export class FinderComponent implements OnInit {
   imageFile: File;
   imagePreview: any;
   images: Image[];
-  selectedType: FinderType = FinderType.Drive;
+  selectedSocialType: SocialType = SocialType.Drive;
   selectedFinderType: {
     id: FinderByType;
     name: string;
@@ -41,8 +40,6 @@ export class FinderComponent implements OnInit {
   email: string = '';
   bib: string = '';
 
-  facebook: FacebookRequest;
-  drive: DriveRequest;
   sessionInfo: SessionInfo;
 
   isLoading: boolean = false;
@@ -55,8 +52,8 @@ export class FinderComponent implements OnInit {
 
   ngOnInit() {}
 
-  selectedTypeChanged(type: FinderType) {
-    this.selectedType = type;
+  selectedSocialTypeChanged(type: SocialType) {
+    this.selectedSocialType = type;
   }
 
   onSearchButtonClicked() {
@@ -69,53 +66,22 @@ export class FinderComponent implements OnInit {
   }
 
   getSession() {
-    switch (this.selectedType) {
-      case FinderType.Drive:
-        this.drive = new DriveRequest({
-          folderUrl: this.url,
-          targetImage: this.imageFile,
-          email: this.email,
-        });
-        this.finderService.getDriveSession(this.drive).subscribe(
-          (res: any) => {
-            const sessionId = res.sessionId;
-            this.getSessionInfo(sessionId);
-          },
-          (err) => {
-            this.isLoading = false;
-            this.notifyService.showToast(err.error.message, 5000);
-          }
-        );
-        break;
-      case FinderType.Facebook:
-        this.facebook = new FacebookRequest({
-          albumUrl: this.url,
-          cookie: this.cookie,
-          token: this.token,
-          targetImage: this.imageFile,
-          email: this.email,
-        });
-        this.finderService
-          .getFacebokSession(this.facebook)
-          .pipe(
-            finalize(() => {
-              this.isLoading = false;
-            })
-          )
-          .subscribe(
-            (res: any) => {
-              const sessionId = res.sessionId;
-              this.getSessionInfo(sessionId);
-            },
-            (err) => {
-              this.notifyService.showToast(err.error.message, 5000);
-            }
-          );
-        break;
-
-      default:
-        break;
-    }
+    this.finderService
+      .getSession(
+        this.generateRequestModel(),
+        this.selectedSocialType,
+        this.selectedFinderType.id
+      )
+      .subscribe(
+        (res: any) => {
+          const sessionId = res.sessionId;
+          this.getSessionInfo(sessionId);
+        },
+        (err) => {
+          this.isLoading = false;
+          this.notifyService.showToast(err.error.message, 5000);
+        }
+      );
   }
 
   getSessionInfo(sessionId: number) {
@@ -144,56 +110,17 @@ export class FinderComponent implements OnInit {
     }
   }
 
+  onSelectedTypeChanged(item) {
+    if (!this.isLoading) {
+      this.selectedFinderType = item;
+    }
+  }
+
   onImageUploaded(file: File) {
     this.imageFile = file;
     const reader = new FileReader();
     reader.onload = (e) => (this.imagePreview = reader.result);
     reader.readAsDataURL(file);
-  }
-
-  findImages() {
-    switch (this.selectedType) {
-      case FinderType.Drive:
-        this.drive = new DriveRequest({
-          folderUrl: this.url,
-          targetImage: this.imageFile,
-        });
-        this.finderService
-          .findImagesFromDriveByOne(this.drive)
-          .pipe(
-            finalize(() => {
-              this.isLoading = false;
-            })
-          )
-          .subscribe(
-            (res: any) => {
-              this.images = res;
-            },
-            (err) => {
-              this.notifyService.showToast(err.error.message, 5000);
-            }
-          );
-        break;
-      case FinderType.Facebook:
-        this.facebook = new FacebookRequest({
-          albumUrl: this.url,
-          cookie: this.cookie,
-          token: this.token,
-          targetImage: this.imageFile,
-        });
-        this.finderService
-          .findImagesFromFacebookByOne(this.facebook)
-          .pipe(finalize(() => (this.isLoading = false)))
-          .subscribe(
-            (res: any) => {
-              this.images = res;
-            },
-            (err) => {
-              this.notifyService.showToast(err.error.message, 5000);
-            }
-          );
-        break;
-    }
   }
 
   saveZip = (filename, images) => {
@@ -240,13 +167,21 @@ export class FinderComponent implements OnInit {
       return false;
     }
     // validate has targetImage
-    if (!this.imageFile) {
-      this.notifyService.showToast('Please select a target image', 3000);
-      return false;
+    if( this.selectedFinderType.id === FinderByType.BIB ) {
+      if (!this.bib) {
+        this.notifyService.showToast('Please enter bib number', 3000);
+        return false;
+      }
+    } else {
+      if (!this.imageFile) {
+        this.notifyService.showToast('Please select a target image', 3000);
+        return false;
+      }
     }
+   
     // if type is facebook, validate has access token, cookie
     if (
-      this.selectedType === 'facebook' &&
+      this.selectedSocialType === 'facebook' &&
       (this.token.trim() === '' || this.cookie.trim() === '')
     ) {
       this.notifyService.showToast(
@@ -269,5 +204,26 @@ export class FinderComponent implements OnInit {
     return email.match(
       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
+  }
+
+  generateRequestModel(): any {
+    switch (this.selectedSocialType) {
+      case SocialType.Drive:
+        return new DriveRequest({
+          folderUrl: this.url,
+          targetImage: this.imageFile,
+          bib: this.bib,
+          email: this.email,
+        });
+      case SocialType.Facebook:
+        return new FacebookRequest({
+          albumUrl: this.url,
+          cookie: this.cookie,
+          token: this.token,
+          targetImage: this.imageFile,
+          bib: this.bib,
+          email: this.email,
+        });
+    }
   }
 }
