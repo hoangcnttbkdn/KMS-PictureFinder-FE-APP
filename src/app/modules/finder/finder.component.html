@@ -2,7 +2,7 @@
   <app-header
     class="w-1/2 text-center"
     [description]="
-      'Enter url or upload image to find similar images.If you enter your email, the results will be sent to you when request session is completed.'
+      'If you enter your email, the results will be sent to you when request session is completed.'
     "
   >
   </app-header>
@@ -26,8 +26,8 @@
           required
           [(ngModel)]="url"
           [ngModelOptions]="{ standalone: true }"
-          aria-label="Enter url"
-          placeholder="Enter url..."
+          aria-label="Enter the path to the facebook photo album or drive folder"
+          placeholder="Enter the path to the facebook photo album or drive folder..."
         />
 
         <button

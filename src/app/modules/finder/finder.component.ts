@@ -121,13 +121,13 @@ export class FinderComponent implements OnInit {
     // validate email
     if (this.email !== '') {
       if (!this.isValidEmail(this.email.trim())) {
-        this.notifyService.showToast('Email is invalid', 3000);
+        this.notifyService.showToast('Please enter valid email', 3000);
         return false;
       }
     }
     // validate valid url
     if (!this.isValidUrl(this.url.trim())) {
-      this.notifyService.showToast('Url is invalid', 3000);
+      this.notifyService.showToast('Please enter valid url', 3000);
       return false;
     }
     // validate has targetImage
