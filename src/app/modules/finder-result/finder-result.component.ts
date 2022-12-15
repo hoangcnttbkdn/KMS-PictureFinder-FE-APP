@@ -1,12 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NotifyService } from '@app/shared/services/notify.service';
 import { finalize, map } from 'rxjs';
-import { SessionInfo } from '../models/session';
-import { FinderService } from '../services/finder.service';
-//
-import JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
+import JSZip from 'jszip';
+//
+import { NavigationType } from '@app/shared/enums/navigation-type.enum';
+
+import { FinderService } from '../services/finder.service';
+import { NotifyService } from '@app/shared/services/notify.service';
+import { CommonService } from '@app/core/services/common.service';
+
+import { SessionInfo } from '../models/session.model';
+import { FacebookRequest } from './../models/facebook-request.model';
+import { DriveRequest } from '../models/drive-request.model';
+import { Image } from '../models/image.model';
 //
 @Component({
   selector: 'app-finder-result',
@@ -14,22 +21,28 @@ import * as FileSaver from 'file-saver';
   styleUrls: ['./finder-result.component.scss'],
 })
 export class FinderResultComponent implements OnInit {
+  NavigationType = NavigationType;
   imageFile: File;
   imagePreview: any;
-  images: any[];
-  allImages: any[];
+  images: Image[];
+  allImages: Image[];
 
   sessionInfo: SessionInfo;
   selectedType: string = 'me';
   url: string = '';
   cookie: string = '';
   token: string = '';
+
   isLoading: boolean = false;
   isLoadingSessionInfo: boolean = true;
+
+  facebook: FacebookRequest = new FacebookRequest();
+  drive: DriveRequest = new DriveRequest();
 
   constructor(
     private finderService: FinderService,
     private notifyService: NotifyService,
+    private commonService: CommonService,
     private route: ActivatedRoute
   ) {}
 
@@ -51,14 +64,20 @@ export class FinderResultComponent implements OnInit {
     } else {
       this.images = Object.assign([], this.allImages);
     }
-
-    console.log(this.images);
   }
 
   getSessionInfo(sessionId: number) {
     if (sessionId) {
       let waiting = setInterval(() => {
         this.finderService.getInfoBySession(sessionId).subscribe((res: any) => {
+          if (!res) {
+            this.notifyService.showToast('This session is not exist', 5000);
+            this.isLoadingSessionInfo = false;
+            this.isLoading = false;
+            clearInterval(waiting);
+            return;
+          }
+
           if (this.isLoadingSessionInfo && !!res) {
             this.sessionInfo = res;
             this.isLoadingSessionInfo = false;
@@ -87,75 +106,4 @@ export class FinderResultComponent implements OnInit {
       }, 5000);
     }
   }
-
-  findImages() {
-    if (this.selectedType === 'drive') {
-      this.finderService
-        .findImagesFromDriveByOne(this.url, this.imageFile)
-        .pipe(
-          finalize(() => {
-            this.isLoading = false;
-          })
-        )
-        .subscribe(
-          (res: any) => {
-            this.images = res;
-          },
-          (err) => {
-            this.notifyService.showToast(err.error.message, 5000);
-          }
-        );
-    } else {
-      this.finderService
-        .findImagesFromFacebookByOne(
-          this.url,
-          this.imageFile,
-          this.token,
-          this.cookie
-        )
-        .pipe(finalize(() => (this.isLoading = false)))
-        .subscribe(
-          (res: any) => {
-            this.images = res;
-          },
-          (err) => {
-            this.notifyService.showToast(err.error.message, 5000);
-          }
-        );
-    }
-  }
-
-  downloadAllImages() {
-    this.saveZip('PictureFindor.zip', this.images);
-  }
-
-  //
-  saveZip = (filename, images) => {
-    const zip = new JSZip();
-    const folder = zip.folder('images'); // folder name where all files will be placed in
-
-    images.forEach((image) => {
-      const blobPromise = fetch(image.url).then((r) => {
-        if (r.status === 200) return r.blob();
-        return Promise.reject(new Error(r.statusText));
-      })
-      .catch((err) => {
-        this.notifyService.showToast('Fail to download images', 5000);
-      });
-      let name = image.url
-        .substring(image.url.lastIndexOf('/') + 1)
-        .split('?')[0];
-
-      // if name not contains jpg, png, jpeg then add .jpg
-      if (!name.match(/\.(jpg|png|jpeg)$/)) {
-        name += '.jpg';
-      }
-      //
-      folder.file(name, blobPromise);
-    });
-
-    zip
-      .generateAsync({ type: 'blob' })
-      .then((blob) => FileSaver.saveAs(blob, filename));
-  };
 }

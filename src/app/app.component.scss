@@ -1,4 +1,26 @@
+$navbar: 57px;
+$footer: 45px;
+
 .app-container {
-    min-height: 100vh;
-    overflow-x: hidden;
+  min-height: 100vh;
+
+  .navbar {
+    height: $navbar;
+    position: sticky;
+    top: 0;
+
+    &-shadow {
+      box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    }
+  }
+  
+  .app-content {
+    height: fit-content;
+    min-height: calc(100vh - $navbar - $footer);
+    padding-bottom: 40px;
+  }
+
+  .footer {
+    height: $footer;
+  }
 }

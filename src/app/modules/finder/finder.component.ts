@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { NotifyService } from '@app/shared/services/notify.service';
-import { finalize, map } from 'rxjs';
-import { SessionInfo } from '../models/session';
+import { finalize } from 'rxjs';
 import { FinderService } from '../services/finder.service';
 //
 import JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
+import { DriveRequest } from '../models/drive-request.model';
+import { FacebookRequest } from '../models/facebook-request.model';
+import { FinderType } from '@app/shared/enums/finder-type.enum';
+import { SessionInfo } from '../models/session.model';
+import { Image } from '../models/image.model';
+import { NavigationType } from '@app/shared/enums/navigation-type.enum';
+import { CommonService } from '@app/core/services/common.service';
 //
 @Component({
   selector: 'app-finder',
@@ -13,34 +19,34 @@ import * as FileSaver from 'file-saver';
   styleUrls: ['./finder.component.scss'],
 })
 export class FinderComponent implements OnInit {
+  FinderType = FinderType;
+  NavigationType = NavigationType;
+
   imageFile: File;
   imagePreview: any;
-  images: [];
+  images: Image[];
+  selectedType: FinderType = FinderType.Drive;
 
-  sessionInfo: SessionInfo;
-  selectedType: string = 'drive';
   url: string = '';
   cookie: string = '';
   token: string = '';
   email: string = '';
+
+  facebook: FacebookRequest;
+  drive: DriveRequest;
+  sessionInfo: SessionInfo;
+
   isLoading: boolean = false;
   isInformPopupVisible: boolean = true;
 
   constructor(
     private finderService: FinderService,
-    private notifyService: NotifyService
+    private notifyService: NotifyService,
   ) {}
 
   ngOnInit() {}
 
-  onImageUploaded(file: File) {
-    this.imageFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => (this.imagePreview = reader.result);
-    reader.readAsDataURL(file);
-  }
-
-  selectedTypeChanged(type: string) {
+  selectedTypeChanged(type: FinderType) {
     this.selectedType = type;
   }
 
@@ -54,31 +60,54 @@ export class FinderComponent implements OnInit {
   }
 
   getSession() {
-    if (this.selectedType === 'drive') {
-      this.finderService
-        .getDriveSession(this.url, this.imageFile, this.email)
-        .subscribe(
-          (res: any) => {
-            const sessionId = res.sessionId;
-            this.getSessionInfo(sessionId);
-          },
-          (err) => {
-            this.notifyService.showToast(err.error.message, 5000);
-          }
-        );
-    } else {
-      this.finderService
-        .getFacebokSession(
-          this.url,
-          this.imageFile,
-          this.token,
-          this.cookie,
-          this.email
-        )
-        .subscribe((res: any) => {
-          const sessionId = res.sessionId;
-          this.getSessionInfo(sessionId);
+    switch (this.selectedType) {
+      case FinderType.Drive:
+        this.drive = new DriveRequest({
+          folderUrl: this.url,
+          targetImage: this.imageFile,
+          email: this.email,
         });
+        this.finderService
+          .getDriveSession(this.drive)
+          .subscribe(
+            (res: any) => {
+              const sessionId = res.sessionId;
+              this.getSessionInfo(sessionId);
+            },
+            (err) => {
+              this.isLoading = false;
+              this.notifyService.showToast(err.error.message, 5000);
+            }
+          );
+        break;
+      case FinderType.Facebook:
+        this.facebook = new FacebookRequest({
+          albumUrl: this.url,
+          cookie: this.cookie,
+          token: this.token,
+          targetImage: this.imageFile,
+          email: this.email,
+        });
+        this.finderService
+          .getFacebokSession(this.facebook)
+          .pipe(
+            finalize(() => {
+              this.isLoading = false;
+            })
+          )
+          .subscribe(
+            (res: any) => {
+              const sessionId = res.sessionId;
+              this.getSessionInfo(sessionId);
+            },
+            (err) => {
+              this.notifyService.showToast(err.error.message, 5000);
+            }
+          );
+        break;
+
+      default:
+        break;
     }
   }
 
@@ -94,16 +123,13 @@ export class FinderComponent implements OnInit {
             clearInterval(waiting);
             this.finderService
               .getImagesBySession(sessionId)
-              .pipe(
-                finalize(() => {
-                  this.isLoading = false;
-                })
-              )
               .subscribe(
                 (res: any) => {
                   this.images = res.filter((image) => image.isMatched);
+                  this.isLoading = false;
                 },
                 (err) => {
+                  this.isLoading = false;
                   this.notifyService.showToast(err.error.message, 5000);
                 }
               );
@@ -113,40 +139,55 @@ export class FinderComponent implements OnInit {
     }
   }
 
+  onImageUploaded(file: File) {
+    this.imageFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => (this.imagePreview = reader.result);
+    reader.readAsDataURL(file);
+  }
+
   findImages() {
-    if (this.selectedType === 'drive') {
-      this.finderService
-        .findImagesFromDriveByOne(this.url, this.imageFile)
-        .pipe(
-          finalize(() => {
-            this.isLoading = false;
-          })
-        )
-        .subscribe(
-          (res: any) => {
-            this.images = res;
-          },
-          (err) => {
-            this.notifyService.showToast(err.error.message, 5000);
-          }
-        );
-    } else {
-      this.finderService
-        .findImagesFromFacebookByOne(
-          this.url,
-          this.imageFile,
-          this.token,
-          this.cookie
-        )
-        .pipe(finalize(() => (this.isLoading = false)))
-        .subscribe(
-          (res: any) => {
-            this.images = res;
-          },
-          (err) => {
-            this.notifyService.showToast(err.error.message, 5000);
-          }
-        );
+    switch (this.selectedType) {
+      case FinderType.Drive:
+        this.drive = new DriveRequest({
+          folderUrl: this.url,
+          targetImage: this.imageFile,
+        });
+        this.finderService
+          .findImagesFromDriveByOne(this.drive)
+          .pipe(
+            finalize(() => {
+              this.isLoading = false;
+            })
+          )
+          .subscribe(
+            (res: any) => {
+              this.images = res;
+            },
+            (err) => {
+              this.notifyService.showToast(err.error.message, 5000);
+            }
+          );
+        break;
+      case FinderType.Facebook:
+        this.facebook = new FacebookRequest({
+          albumUrl: this.url,
+          cookie: this.cookie,
+          token: this.token,
+          targetImage: this.imageFile,
+        });
+        this.finderService
+          .findImagesFromFacebookByOne(this.facebook)
+          .pipe(finalize(() => (this.isLoading = false)))
+          .subscribe(
+            (res: any) => {
+              this.images = res;
+            },
+            (err) => {
+              this.notifyService.showToast(err.error.message, 5000);
+            }
+          );
+        break;
     }
   }
 
@@ -181,9 +222,16 @@ export class FinderComponent implements OnInit {
   };
 
   validate() {
+    // validate email
+    if (this.email !== '') {
+      if (!this.isValidEmail(this.email.trim())) {
+        this.notifyService.showToast('Email is invalid', 3000);
+        return false;
+      }
+    }
     // validate valid url
     if (!this.isValidUrl(this.url.trim())) {
-      this.notifyService.showToast('Please enter a valid url', 3000);
+      this.notifyService.showToast('Url is invalid', 3000);
       return false;
     }
     // validate has targetImage
@@ -210,5 +258,11 @@ export class FinderComponent implements OnInit {
       /^((http|https|ftp|www):\/\/)?([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)(\.)([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]+)/g;
     const result = url.match(urlRegex);
     return result !== null;
+  }
+
+  isValidEmail(email) {
+    return email.match(
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
   }
 }

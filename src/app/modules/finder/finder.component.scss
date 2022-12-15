@@ -1,13 +1,4 @@
 .finder-container {
-  min-height: calc(100vh - 45px);
-  margin: auto;
-  overflow-x: hidden;
-
-  .finder-content {
-    max-width: 1400px;
-    min-height: ̉60vh;
-  }
-
   .image-wrapper {
     width: 33%;
   }
@@ -71,9 +62,11 @@
   text-decoration: none;
   color: #333;
 }
+
 .popup .close:hover {
   color: #06d85f;
 }
+
 .popup .content {
   max-height: 30%;
   overflow: auto;

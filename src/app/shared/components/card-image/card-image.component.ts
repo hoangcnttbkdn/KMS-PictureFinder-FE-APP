@@ -1,6 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonService } from '@app/core/services/common.service';
-import { Observable, Observer } from 'rxjs';
 
 @Component({
   selector: 'app-card-image',
@@ -9,28 +8,26 @@ import { Observable, Observer } from 'rxjs';
 })
 export class CardImageComponent implements OnInit {
   @Input() image: any;
+  @Output() onImageClicked = new EventEmitter();
+
   constructor(private commonService: CommonService) {}
 
   ngOnInit() {}
 
-  viewFullScreen() {}
+  handleImageClicked(image) {
+    this.onImageClicked.emit(image);
+  }
 
-  downloadImage() {
+  downloadImage(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
     const imageUrl = this.image.url;
 
     this.commonService
       .getBase64ImageFromURL(imageUrl)
       .subscribe((base64data) => {
-        console.log(base64data);
-        const base64Image = 'data:image/jpg;base64,' + base64data;
-        var link = document.createElement('a');
-
-        document.body.appendChild(link);
-
-        link.setAttribute('href', base64Image);
-        const filename = this.image.code + '.jpg';
-        link.setAttribute('download', filename);
-        link.click();
+        this.commonService.downloadImage(base64data, this.image.code);
       });
   }
 

@@ -1,18 +1,11 @@
 .finder-result-container {
-  margin: auto;
-
   .image-wrapper {
     width: 33%;
-  }
-
-  .result-container {
-    min-height: calc(100vh - 130px);
-    max-width: 1400px;
   }
 }
 
 @media screen and (max-width: 768px) {
-  .finder-container {
+  .finder-result-container {
     .image-wrapper {
       width: 50%;
     }
@@ -20,7 +13,7 @@
 }
 
 @media screen and (max-width: 480px) {
-  .finder-container {
+  .finder-result-container {
     .image-wrapper {
       width: 100%;
     }
