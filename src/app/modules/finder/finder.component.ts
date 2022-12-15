@@ -1,3 +1,4 @@
+import { FINDER_TYPES } from './../../shared/const/finder-type.const';
 import { Component, OnInit } from '@angular/core';
 import { NotifyService } from '@app/shared/services/notify.service';
 import { finalize } from 'rxjs';
@@ -7,7 +8,7 @@ import JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import { DriveRequest } from '../models/drive-request.model';
 import { FacebookRequest } from '../models/facebook-request.model';
-import { FinderType } from '@app/shared/enums/finder-type.enum';
+import { FinderByType, FinderType } from '@app/shared/enums/finder-type.enum';
 import { SessionInfo } from '../models/session.model';
 import { Image } from '../models/image.model';
 import { NavigationType } from '@app/shared/enums/navigation-type.enum';
@@ -21,16 +22,24 @@ import { CommonService } from '@app/core/services/common.service';
 export class FinderComponent implements OnInit {
   FinderType = FinderType;
   NavigationType = NavigationType;
+  FinderByType = FinderByType;
+  FINDER_TYPES = FINDER_TYPES;
 
   imageFile: File;
   imagePreview: any;
   images: Image[];
   selectedType: FinderType = FinderType.Drive;
+  selectedFinderType: {
+    id: FinderByType;
+    name: string;
+    description: string;
+  } = FINDER_TYPES[0];
 
   url: string = '';
   cookie: string = '';
   token: string = '';
   email: string = '';
+  bib: string = '';
 
   facebook: FacebookRequest;
   drive: DriveRequest;
@@ -41,7 +50,7 @@ export class FinderComponent implements OnInit {
 
   constructor(
     private finderService: FinderService,
-    private notifyService: NotifyService,
+    private notifyService: NotifyService
   ) {}
 
   ngOnInit() {}
@@ -67,18 +76,16 @@ export class FinderComponent implements OnInit {
           targetImage: this.imageFile,
           email: this.email,
         });
-        this.finderService
-          .getDriveSession(this.drive)
-          .subscribe(
-            (res: any) => {
-              const sessionId = res.sessionId;
-              this.getSessionInfo(sessionId);
-            },
-            (err) => {
-              this.isLoading = false;
-              this.notifyService.showToast(err.error.message, 5000);
-            }
-          );
+        this.finderService.getDriveSession(this.drive).subscribe(
+          (res: any) => {
+            const sessionId = res.sessionId;
+            this.getSessionInfo(sessionId);
+          },
+          (err) => {
+            this.isLoading = false;
+            this.notifyService.showToast(err.error.message, 5000);
+          }
+        );
         break;
       case FinderType.Facebook:
         this.facebook = new FacebookRequest({
@@ -121,18 +128,16 @@ export class FinderComponent implements OnInit {
           }
           if (res?.isFinished) {
             clearInterval(waiting);
-            this.finderService
-              .getImagesBySession(sessionId)
-              .subscribe(
-                (res: any) => {
-                  this.images = res.filter((image) => image.isMatched);
-                  this.isLoading = false;
-                },
-                (err) => {
-                  this.isLoading = false;
-                  this.notifyService.showToast(err.error.message, 5000);
-                }
-              );
+            this.finderService.getImagesBySession(sessionId).subscribe(
+              (res: any) => {
+                this.images = res.filter((image) => image.isMatched);
+                this.isLoading = false;
+              },
+              (err) => {
+                this.isLoading = false;
+                this.notifyService.showToast(err.error.message, 5000);
+              }
+            );
           }
         });
       }, 5000);
