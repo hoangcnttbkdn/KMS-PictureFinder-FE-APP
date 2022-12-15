@@ -43,6 +43,8 @@ export class FinderService {
   // FormData
   appendFormData(data: any, socialType: SocialType, finderType: FinderByType) {
     if (finderType === FinderByType.BIB) {
+      data.accessToken = data.token;
+      delete data.token;
       if (data.targetImage) delete data.targetImage;
       if (!data.email) delete data.email;
       return data;
