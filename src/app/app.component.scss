@@ -17,7 +17,9 @@ $footer: 45px;
   .app-content {
     height: fit-content;
     min-height: calc(100vh - $navbar - $footer);
-    padding-bottom: 40px;
+    max-width: 1800px;
+    padding: 0 3vw;
+    margin: auto;
   }
 
   .footer {
