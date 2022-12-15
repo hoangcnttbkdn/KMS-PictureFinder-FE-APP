@@ -1,18 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { finalize, map } from 'rxjs';
-import * as FileSaver from 'file-saver';
-import JSZip from 'jszip';
+import { finalize } from 'rxjs';
 //
 import { NavigationType } from '@app/shared/enums/navigation-type.enum';
 
 import { FinderService } from '../services/finder.service';
 import { NotifyService } from '@app/shared/services/notify.service';
-import { CommonService } from '@app/core/services/common.service';
 
 import { SessionInfo } from '../models/session.model';
-import { FacebookRequest } from './../models/facebook-request.model';
-import { DriveRequest } from '../models/drive-request.model';
 import { Image } from '../models/image.model';
 //
 @Component({
@@ -23,12 +18,10 @@ import { Image } from '../models/image.model';
 export class FinderResultComponent implements OnInit {
   NavigationType = NavigationType;
   imageFile: File;
-  imagePreview: any;
   images: Image[];
   allImages: Image[];
 
   sessionInfo: SessionInfo;
-  selectedType: string = 'me';
   url: string = '';
   cookie: string = '';
   token: string = '';
@@ -36,13 +29,9 @@ export class FinderResultComponent implements OnInit {
   isLoading: boolean = false;
   isLoadingSessionInfo: boolean = true;
 
-  facebook: FacebookRequest = new FacebookRequest();
-  drive: DriveRequest = new DriveRequest();
-
   constructor(
     private finderService: FinderService,
     private notifyService: NotifyService,
-    private commonService: CommonService,
     private route: ActivatedRoute
   ) {}
 
@@ -52,17 +41,6 @@ export class FinderResultComponent implements OnInit {
       this.isLoading = true;
       this.isLoadingSessionInfo = true;
       this.getSessionInfo(parseInt(id));
-    }
-  }
-
-  onTypeChange() {
-    if (this.selectedType === 'me') {
-      this.images = Object.assign(
-        [],
-        this.allImages.filter((image) => image.isMatched)
-      );
-    } else {
-      this.images = Object.assign([], this.allImages);
     }
   }
 

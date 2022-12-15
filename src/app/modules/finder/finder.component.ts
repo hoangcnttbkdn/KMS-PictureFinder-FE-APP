@@ -1,11 +1,8 @@
 import { FINDER_TYPES } from './../../shared/const/finder-type.const';
 import { Component, OnInit } from '@angular/core';
 import { NotifyService } from '@app/shared/services/notify.service';
-import { finalize } from 'rxjs';
 import { FinderService } from '../services/finder.service';
 //
-import JSZip from 'jszip';
-import * as FileSaver from 'file-saver';
 import { DriveRequest } from '../models/drive-request.model';
 import { FacebookRequest } from '../models/facebook-request.model';
 import { FinderByType, SocialType } from '@app/shared/enums/finder-type.enum';
@@ -51,10 +48,6 @@ export class FinderComponent implements OnInit {
   ) {}
 
   ngOnInit() {}
-
-  selectedSocialTypeChanged(type: SocialType) {
-    this.selectedSocialType = type;
-  }
 
   onSearchButtonClicked() {
     if (!this.validate()) {
@@ -123,36 +116,7 @@ export class FinderComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  saveZip = (filename, images) => {
-    const zip = new JSZip();
-    const folder = zip.folder('images'); // folder name where all files will be placed in
-
-    images.forEach((image) => {
-      const blobPromise = fetch(image.url)
-        .then((r) => {
-          if (r.status === 200) return r.blob();
-          return Promise.reject(new Error(r.statusText));
-        })
-        .catch((err) => {
-          this.notifyService.showToast('Fail to download images', 5000);
-        });
-      let name = image.url
-        .substring(image.url.lastIndexOf('/') + 1)
-        .split('?')[0];
-
-      // if name not contains jpg, png, jpeg then add .jpg
-      if (!name.match(/\.(jpg|png|jpeg)$/)) {
-        name += '.jpg';
-      }
-      //
-      folder.file(name, blobPromise);
-    });
-
-    zip
-      .generateAsync({ type: 'blob' })
-      .then((blob) => FileSaver.saveAs(blob, filename));
-  };
-
+  //#region validate
   validate() {
     // validate email
     if (this.email !== '') {
@@ -205,7 +169,9 @@ export class FinderComponent implements OnInit {
       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
   }
+  //#endregion
 
+  //#region Helper
   generateRequestModel(): any {
     switch (this.selectedSocialType) {
       case SocialType.Drive:
@@ -226,4 +192,5 @@ export class FinderComponent implements OnInit {
         });
     }
   }
+  //#endregion
 }

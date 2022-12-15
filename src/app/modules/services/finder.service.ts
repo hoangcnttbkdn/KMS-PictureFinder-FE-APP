@@ -12,25 +12,6 @@ import { FinderByType, SocialType } from '@app/shared/enums/finder-type.enum';
 })
 export class FinderService {
   constructor(private baseService: BaseService) {}
-  //
-  getFacebokSession(
-    data: FacebookRequest,
-    type: FinderByType
-  ): Observable<any> {
-    const url = 'facebook/' + type;
-    return this.baseService.postForm<any>(
-      url,
-      this.appendFormData(data, SocialType.Facebook, type)
-    );
-  }
-
-  getDriveSession(data: DriveRequest, type: FinderByType): Observable<any> {
-    const url = 'gg-drive/' + type;
-    return this.baseService.postForm<any>(
-      url,
-      this.appendFormData(data, SocialType.Drive, type)
-    );
-  }
 
   getSession(
     data: DriveRequest | FacebookRequest,
@@ -59,15 +40,13 @@ export class FinderService {
     return this.baseService.get<Image>(`sessions/${sessionId}/images`);
   }
 
-  // append Form Data
+  // FormData
   appendFormData(data: any, socialType: SocialType, finderType: FinderByType) {
     if (finderType === FinderByType.BIB) {
       if (data.targetImage) delete data.targetImage;
       if (!data.email) delete data.email;
       return data;
     } else {
-      console.log(socialType);
-
       const formData = new FormData();
       if (data.email) formData.append('email', data.email);
 
