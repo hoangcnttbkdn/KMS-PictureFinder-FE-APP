@@ -4,6 +4,7 @@ export class FacebookRequest {
   token: string;
   cookie: string;
   email?: string;
+  bib?: string;
 
   public constructor(init?: Partial<FacebookRequest>) {
     Object.assign(this, init);

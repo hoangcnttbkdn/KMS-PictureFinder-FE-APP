@@ -1,6 +1,7 @@
 export class SessionInfo {
   id: number;
   url: string;
+  bib?: string;
   totalImages: number;
   type: string;
   isFinished: boolean;

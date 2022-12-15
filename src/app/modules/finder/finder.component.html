@@ -8,47 +8,6 @@
   </app-header>
   <section class="finder-content m-auto px-3">
     <div class="flex flex-wrap justify-center gap-2 mb-5">
-      <ul class="flex gap-2 justify-center md:justify-end">
-        <li>
-          <input
-            type="radio"
-            id="hosting-small"
-            name="selectedType"
-            [(ngModel)]="selectedType"
-            [value]="FinderType.Drive"
-            class="hidden peer"
-            required
-          />
-          <label
-            for="hosting-small"
-            class="inline-flex justify-between items-center p-1 text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:shadow-md hover:text-gray-600 hover:bg-gray-100"
-          >
-            <img
-              class="h-10 w-10 rounded-full shadow-sm"
-              src="./assets/images/drive.png"
-            />
-          </label>
-        </li>
-        <li>
-          <input
-            type="radio"
-            id="hosting-big"
-            name="selectedType"
-            [(ngModel)]="selectedType"
-            [value]="FinderType.Facebook"
-            class="hidden peer"
-          />
-          <label
-            for="hosting-big"
-            class="inline-flex justify-between items-center p-1 text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:shadow-md hover:text-gray-600 hover:bg-gray-100"
-          >
-            <img
-              class="h-10 w-10 rounded-full shadow-sm"
-              src="./assets/images/facebook.png"
-            />
-          </label>
-        </li>
-      </ul>
       <input
         class="w-full lg:w-1/5 focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 px-5 ring-1 ring-slate-200 shadow-sm"
         type="text"
@@ -64,6 +23,7 @@
           [disabled]="isLoading"
           class="focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 pl-5 pr-10 ring-1 ring-slate-200 shadow-sm"
           type="text"
+          required
           [(ngModel)]="url"
           [ngModelOptions]="{ standalone: true }"
           aria-label="Enter url"
@@ -71,7 +31,7 @@
         />
 
         <button
-          [disabled]="!url || isLoading || !imageFile"
+          [disabled]="isLoading"
           class="absolute right-1 top-1/2 -mt-5 cursor-pointer"
           (click)="onSearchButtonClicked()"
         >
@@ -94,14 +54,16 @@
           </a>
         </button>
       </form>
+      <ng-container *ngTemplateOutlet="typePickerTemplate"></ng-container>
     </div>
     <div
-      *ngIf="selectedType === FinderType.Facebook"
+      *ngIf="selectedSocialType === SocialType.Facebook"
       class="flex flex-wrap md:flex-nowrap gap-4 mb-5"
     >
       <input
         class="w-full focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 px-5 ring-1 ring-slate-200 shadow-sm"
         type="text"
+        required
         [disabled]="isLoading"
         [(ngModel)]="cookie"
         [ngModelOptions]="{ standalone: true }"
@@ -111,6 +73,7 @@
       <input
         class="w-full focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 px-5 ring-1 ring-slate-200 shadow-sm"
         type="text"
+        required
         [disabled]="isLoading"
         [(ngModel)]="token"
         [ngModelOptions]="{ standalone: true }"
@@ -121,16 +84,48 @@
 
     <div class="lg:flex gap-5 mb-10">
       <div class="lg:w-1/5 mb-5 flex-shrink-0">
-        <img
-          *ngIf="imagePreview"
-          [src]="imagePreview"
-          class="w-full h-52 rounded-md shadow-md mb-2 object-cover"
-        />
-        <app-upload-image
-          [isLoading]="isLoading"
-          [onlyButton]="imagePreview"
-          (onImageUploaded)="onImageUploaded($event)"
-        ></app-upload-image>
+        <ng-container *ngTemplateOutlet="selectFindType"></ng-container>
+        <p class="text-xs text-gray-400 mb-3">
+          {{ selectedFinderType.description }}
+        </p>
+        <span [ngSwitch]="selectedFinderType.id">
+          <p *ngSwitchCase="FinderByType.Face">
+            <img
+              *ngIf="imagePreview"
+              [src]="imagePreview"
+              class="w-full h-52 rounded-md shadow-md mb-2 object-cover"
+            />
+            <app-upload-image
+              [isLoading]="isLoading"
+              [onlyButton]="imagePreview"
+              (onImageUploaded)="onImageUploaded($event)"
+            ></app-upload-image>
+          </p>
+          <p *ngSwitchCase="FinderByType.BIB">
+            <input
+              [disabled]="isLoading"
+              class="focus:ring-2 focus:ring-indigo-500 focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-3 pl-5 pr-10 ring-1 ring-slate-200 shadow-sm"
+              type="text"
+              required
+              [(ngModel)]="bib"
+              [ngModelOptions]="{ standalone: true }"
+              aria-label="Enter bib"
+              placeholder="Enter bib..."
+            />
+          </p>
+          <p *ngSwitchCase="FinderByType.Clothes">
+            <img
+              *ngIf="imagePreview"
+              [src]="imagePreview"
+              class="w-full h-52 rounded-md shadow-md mb-2 object-cover"
+            />
+            <app-upload-image
+              [isLoading]="isLoading"
+              [onlyButton]="imagePreview"
+              (onImageUploaded)="onImageUploaded($event)"
+            ></app-upload-image>
+          </p>
+        </span>
 
         <a
           *ngIf="sessionInfo"
@@ -159,7 +154,7 @@
         *ngIf="!isLoading; else skeleton"
         class="lg:w-4/5 flex flex-wrap justify-start gap-y-12 pl-5"
       >
-        <app-image-gallery class="w-full " [images]="images"></app-image-gallery>
+        <app-image-gallery class="w-full" [images]="images"></app-image-gallery>
       </div>
 
       <ng-template #skeleton>
@@ -242,3 +237,69 @@
     </div>
   </div>
 </ng-container>
+
+<ng-template #selectFindType>
+  <ul
+    class="flex gap-2 mb-2 justify-between items-start text-sm font-medium text-center text-gray-500 border-b border-gray-200"
+  >
+    <li *ngFor="let item of FINDER_TYPES">
+      <a
+        class="group inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+        [class]="
+          item.id === selectedFinderType.id
+            ? 'active text-blue-600 border-blue-600'
+            : ''
+        "
+        [class.cursor-pointer]="!isLoading"
+        (click)="onSelectedTypeChanged(item)"
+      >
+        <img class="h-10 w-10 rounded-sm shadow-sm" [src]="item.url" />
+        {{ item.name }}
+      </a>
+    </li>
+  </ul>
+</ng-template>
+
+<ng-template #typePickerTemplate>
+  <ul class="flex gap-2 justify-center md:justify-end">
+    <li>
+      <input
+        type="radio"
+        id="hosting-small"
+        name="selectedSocialType"
+        [(ngModel)]="selectedSocialType"
+        [value]="SocialType.Drive"
+        class="hidden peer"
+        required
+      />
+      <label
+        for="hosting-small"
+        class="inline-flex justify-between items-center p-1 text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:shadow-md hover:text-gray-600 hover:bg-gray-100"
+      >
+        <img
+          class="h-10 w-10 rounded-full shadow-sm"
+          src="./assets/images/drive.png"
+        />
+      </label>
+    </li>
+    <li>
+      <input
+        type="radio"
+        id="hosting-big"
+        name="selectedSocialType"
+        [(ngModel)]="selectedSocialType"
+        [value]="SocialType.Facebook"
+        class="hidden peer"
+      />
+      <label
+        for="hosting-big"
+        class="inline-flex justify-between items-center p-1 text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 peer-checked:shadow-md hover:text-gray-600 hover:bg-gray-100"
+      >
+        <img
+          class="h-10 w-10 rounded-full shadow-sm"
+          src="./assets/images/facebook.png"
+        />
+      </label>
+    </li>
+  </ul>
+</ng-template>
